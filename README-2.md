@@ -79,7 +79,11 @@ Reasons for this choice:
 └── turbo.json
 ```
 
-## 4. Applications
+## 4. Data modeling
+
+Modelo de datos
+
+## 5. Applications
 
 ### `apps/web`
 
@@ -121,7 +125,7 @@ POST   /restaurants/:id/favourites
 DELETE /restaurants/:id/favourites
 ```
 
-## 5. Local Development
+## 6. Local Development
 
 ### Requirements
 
@@ -182,7 +186,7 @@ When not defined, the frontend falls back to:
 http://localhost:3001
 ```
 
-## 6. Build, Lint, and Test
+## 7. Build, Lint, and Test
 
 ### Build Everything
 
@@ -228,7 +232,7 @@ The API currently includes Jest coverage for:
 - `GET /message/:name`
 - Enumerar los tests implementados
 
-## 7. Docker Deployment
+## 8. Docker Deployment
 
 The repository includes one Dockerfile for the frontend and one for the backend.
 
@@ -279,23 +283,7 @@ Frontend: http://localhost:3000
 API:      http://localhost:3001
 ```
 
-## 8. How the Frontend and Backend Communicate
-
-The Next.js app consumes the Express API over HTTP.
-
-Current request flow:
-
-```txt
-Browser
-  -> Next.js frontend on port 3000
-  -> fetch request to Express API on port 3001
-  -> Express returns JSON
-  -> React state updates the UI
-```
-
-This keeps the frontend and backend separated while still allowing them to be developed together inside the same monorepo.
-
-## 9. Backend Architecture
+## 10. Backend Architecture
 
 As the API grows, avoid placing all logic directly inside Express route handlers. A maintainable structure would be:
 
@@ -330,7 +318,7 @@ Recommended responsibilities:
 - Repositories isolate persistence.
 - Errors provide consistent API responses.
 
-## 10. Booking Logic Considerations
+## 11. Booking Logic Considerations
 
 The most important part of the project is the booking flow. A good implementation should handle:
 
@@ -344,7 +332,7 @@ The most important part of the project is the booking flow. A good implementatio
 
 For a production system, the booking creation should be protected by database constraints or transactions to prevent race conditions when two users book the same table at the same time.
 
-## 11. Suggested Frontend Pages
+## 12. Suggested Frontend Pages
 
 The Next.js frontend can be organized around the main user journey.
 
@@ -370,7 +358,7 @@ Restaurant list
   -> Booking confirmation
 ```
 
-## 12. Validation and Error Handling
+## 13. Validation and Error Handling
 
 Recommended validation approach:
 
@@ -391,7 +379,7 @@ Recommended API error shape:
 }
 ```
 
-## 13. Testing Strategy
+## 14. Testing Strategy
 
 ### Backend Tests
 
@@ -429,3 +417,9 @@ View confirmation
 Cancel booking
 Confirm availability is restored
 ```
+
+## 15. Future improvements
+
+- Email notifications for booking confirmations and cancellations.
+- Online payment integration for booking deposits.
+- Admin panel for restaurant owners to manage availability and view bookings.

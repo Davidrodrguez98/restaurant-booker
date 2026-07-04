@@ -14,6 +14,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 - Ayudar a elegir las tecnologías adeacuadas para el proyecto.
 - Ayudar a cambiar yarn por pnpm en boilerplate de turborepo con docker y resolver errores de este cambio.
+- boilerplate express y next turborepo con docker, better auth, drizzle, supabase y tailwindcss.
 -
 
 ## Cosas útiles
