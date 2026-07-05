@@ -6,18 +6,17 @@ import { router } from "./router";
 
 export const createServer = (): Express => {
 	const app = express();
+
+	app.disable("x-powered-by");
 	app.all("/api/auth/*", toNodeHandler(auth));
 	app.use(express.json());
-	  app
-	    .use(cors({
+	app.use(
+		cors({
 			origin: ["http://localhost:3000", "http://localhost:3001"],
 			methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
-			credentials: true,
-		}))
+		}),
+	);
 	app.use("/api", router);
-	app.get("/", (req, res) => {
-		return res.json({ message: "Hello from the API!" });
-	});
 
 	return app;
 };
