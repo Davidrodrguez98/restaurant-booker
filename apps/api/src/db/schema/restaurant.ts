@@ -1,7 +1,7 @@
 import { pgTable, varchar, uuid } from "drizzle-orm/pg-core";
 import { InferInsertModel, InferSelectModel } from "drizzle-orm";
 
-export const restaurants = pgTable(
+export const restaurant = pgTable(
   "restaurants",
   {
     id: uuid("id").defaultRandom().primaryKey(),
@@ -9,5 +9,5 @@ export const restaurants = pgTable(
   }
 );
 
-export type Restaurant = InferSelectModel<typeof restaurants>;
-export type NewRestaurant = InferInsertModel<typeof restaurants>;
+export type Restaurant = InferSelectModel<typeof restaurant>;
+export type NewRestaurant = InferInsertModel<typeof restaurant>;
