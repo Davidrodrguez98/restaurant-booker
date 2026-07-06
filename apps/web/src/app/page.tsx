@@ -2,6 +2,7 @@
 
 import { useEffect, useState, ChangeEvent, FormEvent } from "react";
 import { Button } from "@repo/ui/button";
+import { authFetch } from "../lib/auth-fetch";
 
 const API_HOST =
 	process.env.NEXT_PUBLIC_API_HOST || "http://localhost:3001/api";
@@ -23,10 +24,8 @@ export default function Web() {
 		e.preventDefault();
 
 		try {
-			const result = await fetch(`${API_HOST}/message/${name}`);
-			if (!result.ok) throw error;
-			const response = await result.json();
-			setResponse(response);
+			const result = await authFetch(`${API_HOST}/message/${name}`, "GET");
+			setResponse(result);
 		} catch (err) {
 			console.error(err);
 			setError("Unable to fetch response");

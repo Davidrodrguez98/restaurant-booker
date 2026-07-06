@@ -2,7 +2,7 @@ CREATE TYPE "cuisine_type" AS ENUM('ASIAN', 'PIZZA', 'AMERICAN', 'MEXICAN');--> 
 CREATE TYPE "days_of_week" AS ENUM('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY');--> statement-breakpoint
 CREATE TYPE "reservation_status" AS ENUM('CONFIRMED', 'CANCELLED');--> statement-breakpoint
 CREATE TABLE "account" (
-	"id" uuid PRIMARY KEY,
+	"id" uuid PRIMARY KEY DEFAULT pg_catalog.gen_random_uuid(),
 	"account_id" text NOT NULL,
 	"provider_id" text NOT NULL,
 	"user_id" uuid NOT NULL,
@@ -18,7 +18,7 @@ CREATE TABLE "account" (
 );
 --> statement-breakpoint
 CREATE TABLE "session" (
-	"id" uuid PRIMARY KEY,
+	"id" uuid PRIMARY KEY DEFAULT pg_catalog.gen_random_uuid(),
 	"expires_at" timestamp NOT NULL,
 	"token" text NOT NULL UNIQUE,
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -29,7 +29,7 @@ CREATE TABLE "session" (
 );
 --> statement-breakpoint
 CREATE TABLE "user" (
-	"id" uuid PRIMARY KEY,
+	"id" uuid PRIMARY KEY DEFAULT pg_catalog.gen_random_uuid(),
 	"name" text NOT NULL,
 	"email" text NOT NULL UNIQUE,
 	"email_verified" boolean DEFAULT false NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE "user" (
 );
 --> statement-breakpoint
 CREATE TABLE "verification" (
-	"id" uuid PRIMARY KEY,
+	"id" uuid PRIMARY KEY DEFAULT pg_catalog.gen_random_uuid(),
 	"identifier" text NOT NULL,
 	"value" text NOT NULL,
 	"expires_at" timestamp NOT NULL,

@@ -1,8 +1,10 @@
-import { defineRelations } from "drizzle-orm";
+import { defineRelations, sql } from "drizzle-orm";
 import { pgTable, text, timestamp, boolean, index, uuid } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
-  id: uuid("id").primaryKey(),
+  id: uuid("id")
+    .default(sql`pg_catalog.gen_random_uuid()`)
+    .primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").default(false).notNull(),
@@ -17,7 +19,9 @@ export const user = pgTable("user", {
 export const session = pgTable(
   "session",
   {
-    id: uuid("id").primaryKey(),
+    id: uuid("id")
+      .default(sql`pg_catalog.gen_random_uuid()`)
+      .primaryKey(),
     expiresAt: timestamp("expires_at").notNull(),
     token: text("token").notNull().unique(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -36,7 +40,9 @@ export const session = pgTable(
 export const account = pgTable(
   "account",
   {
-    id: uuid("id").primaryKey(),
+    id: uuid("id")
+      .default(sql`pg_catalog.gen_random_uuid()`)
+      .primaryKey(),
     accountId: text("account_id").notNull(),
     providerId: text("provider_id").notNull(),
     userId: uuid("user_id")
@@ -60,7 +66,9 @@ export const account = pgTable(
 export const verification = pgTable(
   "verification",
   {
-    id: uuid("id").primaryKey(),
+    id: uuid("id")
+      .default(sql`pg_catalog.gen_random_uuid()`)
+      .primaryKey(),
     identifier: text("identifier").notNull(),
     value: text("value").notNull(),
     expiresAt: timestamp("expires_at").notNull(),
