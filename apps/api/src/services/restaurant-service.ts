@@ -5,6 +5,7 @@ import {
   RestaurantRepository,
 } from "@/db/repositories/restaurant-repository";
 import type { RestaurantInsert } from "@/db/schemas/schema";
+import { ensureRestaurantExists } from "@/utils/ensure-restaurant-exists";
 
 export class RestaurantService {
   constructor(
@@ -17,13 +18,7 @@ export class RestaurantService {
   }
 
   async getRestaurantById(id: string) {
-    const restaurant = await this.repository.getById(id);
-
-    if (!restaurant) {
-      throw new Error("Restaurant not found");
-    }
-
-    return restaurant;
+    return ensureRestaurantExists(id, this.repository);
   }
 
   async createRestaurant(data: RestaurantInsert) {

@@ -11,7 +11,10 @@
     "test": "jest --detectOpenHandles"
   },
   "jest": {
-    "preset": "@repo/jest-presets/node"
+    "preset": "@repo/jest-presets/node",
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/src/$1"
+    }
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "^1.6.23",

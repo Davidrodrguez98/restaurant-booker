@@ -3,8 +3,11 @@ import cors from "cors";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "@/utils/auth";
 import { restaurantRouter } from "@/routers/restaurant-router";
+import { commentRouter } from "@/routers/comment-router";
+import { reservationRouter } from "@/routers/reservation-router";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
+import { favouriteRouter } from "./routers/favourite-router";
 
 const swaggerOptions = {
   definition: {
@@ -38,6 +41,9 @@ export const createServer = (): Express => {
 		res.status(200).json({ status: "ok" });
 	});
 	app.use("/api/restaurants", restaurantRouter);
+	app.use("/api", commentRouter);
+	app.use("/api/reservations", reservationRouter);
+	app.use("/api/me/favourites", favouriteRouter);
 
 	return app;
 };

@@ -67,22 +67,7 @@ export const serviceWindow = pgTable("service_windows", {
   end: time("end").notNull(),
 });
 
-export const reservationSettingRelations = defineRelations(
-  {
-	reservationSetting,
-	serviceWindow
-  },
-  (r) => ({
-	reservationSetting: {
-	  serviceWindows: r.many.serviceWindow({
-		from: r.reservationSetting.id,
-		to: r.serviceWindow.reservationSettingId,
-	  }),
-	},
-  }),
-);
-
-export const status = pgEnum("reservation_status", ["CONFIRMED", "CANCELLED"]);
+export const reservationStatus = pgEnum("reservation_status", ["CONFIRMED", "CANCELLED"]);
 
 export const reservation = pgTable("reservations", {
   id: uuid("id").primaryKey().default(sql`pg_catalog.gen_random_uuid()`),
@@ -95,13 +80,13 @@ export const reservation = pgTable("reservations", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
 
-  reservation_date: date("reservation_date").notNull(),
+  reservationDate: date("reservation_date").notNull(),
 
-  reservation_time: time("reservation_time").notNull(),
+  reservationTime: time("reservation_time").notNull(),
 
-  party_size: integer("party_size").notNull(),
+  partySize: integer("party_size").notNull(),
 
-  status: status("status").notNull(),
+  status: reservationStatus("status").notNull(),
 
   createdAt: timestamp("created_at").notNull(),
 });
@@ -167,6 +152,7 @@ export const restaurantRelations = defineRelations(
     comment,
     reservation,
     favourite,
+	serviceWindow,
   },
   (r) => ({
     restaurant: {
@@ -191,6 +177,46 @@ export const restaurantRelations = defineRelations(
         to: r.favourite.restaurantId,
       }),
     },
+	reservationSetting: {
+	  restaurant: r.one.restaurant({
+		from: r.reservationSetting.restaurantId,
+		to: r.restaurant.id,
+	  }),
+	  serviceWindows: r.many.serviceWindow({
+		from: r.reservationSetting.id,
+		to: r.serviceWindow.reservationSettingId,
+	  }),
+	},
+	serviceWindow: {
+	  reservationSetting: r.one.reservationSetting({
+		from: r.serviceWindow.reservationSettingId,
+		to: r.reservationSetting.id,
+	  }),
+	},
+	operatingHour: {
+	  restaurant: r.one.restaurant({
+		from: r.operatingHour.restaurantId,
+		to: r.restaurant.id,
+	  }),
+	},
+	comment: {
+	  restaurant: r.one.restaurant({
+		from: r.comment.restaurantId,
+		to: r.restaurant.id,
+	  }),
+	},
+	reservation: {
+	  restaurant: r.one.restaurant({
+		from: r.reservation.restaurantId,
+		to: r.restaurant.id,
+	  }),
+	},
+	favourite: {
+	  restaurant: r.many.restaurant({
+		from: r.favourite.restaurantId,
+		to: r.restaurant.id,
+	  }),
+	}
   }),
 );
 

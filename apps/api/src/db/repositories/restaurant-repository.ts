@@ -3,10 +3,7 @@
 import { eq } from "drizzle-orm";
 
 import { db } from "@/db/db";
-import {
-  restaurant,
-  type RestaurantInsert,
-} from "@/db/schemas/schema";
+import { restaurant, type RestaurantInsert } from "@/db/schemas/schema";
 
 export class RestaurantRepository {
   async getAll() {
@@ -24,13 +21,7 @@ export class RestaurantRepository {
   }
 
   async create(data: RestaurantInsert) {
-	console.log("Creating restaurant with data:", data);
-    const [created] = await db
-      .insert(restaurant)
-      .values(data)
-      .returning();
-
-	console.log("Created restaurant:", created);
+    const [created] = await db.insert(restaurant).values(data).returning();
 
     return created;
   }

@@ -16,5 +16,7 @@ export async function requireAuth(
 		});
 	}
 
+	req.session = session;
+
 	next();
 }

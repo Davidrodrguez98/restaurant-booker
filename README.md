@@ -17,8 +17,9 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - boilerplate express y next turborepo con docker, better auth, drizzle, supabase y tailwindcss.
 - Arreglar pequeños bugs al generar migraciones de better-auth con drizzle, como la definición de relaciones de la forma v2 de drizzle.
 - Arreglar bug de dependencias circulares con relaciones de drizzle al estar en distintos archivos.
-- Construir repositorios y servicios base para las entidades de la app, como restaurant, reservation, user, review, etc.
--
+- Construir repositorios y servicios base para las entidades de la app, como restaurant, reservation, comment, etc.
+- Output rechazado de la IA: Código repetitivo que le dije que lo extraiga a una función aparte.
+- mejorar organizacion de archivos y carpetas, como separar lógica de comentarios y de restaurantes.
 
 ## Cosas útiles
 

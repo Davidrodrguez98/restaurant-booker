@@ -1,8 +1,11 @@
 import { Router } from "express";
-import { requireAuth} from "@/utils/middleware";
+
+import { requireAuth } from "@/utils/middleware";
 import { restaurantService } from "@/services/restaurant-service";
 
 export const restaurantRouter: Router = Router();
+
+restaurantRouter.use(requireAuth);
 
 /**
  * @swagger
@@ -170,54 +173,53 @@ export const restaurantRouter: Router = Router();
  */
 
 restaurantRouter
-	.use(requireAuth)
-	.get("", (req, res) => {
-		return restaurantService
-			.getAllRestaurants()
-			.then((restaurants) => res.json(restaurants))
-			.catch((err) => {
-				console.error("Error fetching restaurants:", err);
-				res.status(err.status || 500).json({ error: err.message })
-			});
-	})
-	.get("/:id", (req, res) => {
-		const { id } = req.params;
-		return restaurantService
-			.getRestaurantById(id)
-			.then((restaurant) => res.json(restaurant))
-			.catch((err) => {
-				console.error("Error fetching restaurant:", err);
-				res.status(404).json({ error: err.message });
-			});
-	})
-	.post("", (req, res) => {
-		const data = req.body;
-		return restaurantService
-			.createRestaurant(data)
-			.then((restaurant) => res.status(201).json(restaurant))
-			.catch((err) => {
-				console.error("Error creating restaurant:", err);
-				res.status(err.status || 400).json({ error: err.message });
-			});
-	})
-	.patch("/:id", (req, res) => {
-		const { id } = req.params;
-		const data = req.body;
-		return restaurantService
-			.updateRestaurant(id, data)
-			.then((restaurant) => res.json(restaurant))
-			.catch((err) => {
-				console.error("Error updating restaurant:", err);
-				res.status(404).json({ error: err.message });
-			});
-	})
-	.delete("/:id", (req, res) => {
-		const { id } = req.params;
-		return restaurantService
-			.deleteRestaurant(id)
-			.then(() => res.status(204).send())
-			.catch((err) => {
-				console.error("Error deleting restaurant:", err);
-				res.status(404).json({ error: err.message });
-			});
-	});
+  .get("", (req, res) => {
+    return restaurantService
+      .getAllRestaurants()
+      .then((restaurants) => res.json(restaurants))
+      .catch((err) => {
+        console.error("Error fetching restaurants:", err);
+        res.status(err.status || 500).json({ error: err.message });
+      });
+  })
+  .get("/:id", (req, res) => {
+    const { id } = req.params;
+    return restaurantService
+      .getRestaurantById(id)
+      .then((restaurant) => res.json(restaurant))
+      .catch((err) => {
+        console.error("Error fetching restaurant:", err);
+        res.status(err.status || 404).json({ error: err.message });
+      });
+  })
+  .post("", (req, res) => {
+    const data = req.body;
+    return restaurantService
+      .createRestaurant(data)
+      .then((restaurant) => res.status(201).json(restaurant))
+      .catch((err) => {
+        console.error("Error creating restaurant:", err);
+        res.status(err.status || 400).json({ error: err.message });
+      });
+  })
+  .patch("/:id", (req, res) => {
+    const { id } = req.params;
+    const data = req.body;
+    return restaurantService
+      .updateRestaurant(id, data)
+      .then((restaurant) => res.json(restaurant))
+      .catch((err) => {
+        console.error("Error updating restaurant:", err);
+        res.status(err.status || 404).json({ error: err.message });
+      });
+  })
+  .delete("/:id", (req, res) => {
+    const { id } = req.params;
+    return restaurantService
+      .deleteRestaurant(id)
+      .then(() => res.status(204).send())
+      .catch((err) => {
+        console.error("Error deleting restaurant:", err);
+        res.status(err.status || 404).json({ error: err.message });
+      });
+  });

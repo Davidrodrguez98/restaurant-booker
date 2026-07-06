@@ -424,3 +424,4 @@ Confirm availability is restored
 - Online payment integration for booking deposits.
 - Admin panel for restaurant owners to manage availability and view bookings.
 - Pagination for restaurant list and booking history.
+- Filtering and sorting options for restaurants (e.g., by cuisine, rating, distance).
