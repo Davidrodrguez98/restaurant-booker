@@ -15,9 +15,10 @@ import {
 	InferInsertModel,
 	InferSelectModel,
 	defineRelations,
+	sql,
 } from "drizzle-orm";
 
-import { user } from "./auth";
+import { user } from "@/db/schemas/auth";
 
 export const cuisineTypeEnum = pgEnum("cuisine_type", [
 	"ASIAN",
@@ -27,7 +28,7 @@ export const cuisineTypeEnum = pgEnum("cuisine_type", [
 ]);
 
 export const restaurant = pgTable("restaurants", {
-	id: uuid("id").primaryKey(),
+	id: uuid("id").primaryKey().default(sql`pg_catalog.gen_random_uuid()`),
 	name: varchar("name", { length: 100 }).notNull(),
 	description: text("description").notNull(),
 	address: varchar("address", { length: 255 }).notNull(),
@@ -41,7 +42,7 @@ export const restaurant = pgTable("restaurants", {
 });
 
 export const reservationSetting = pgTable("reservation_settings", {
-  id: uuid("id").primaryKey(),
+  id: uuid("id").primaryKey().default(sql`pg_catalog.gen_random_uuid()`),
 
   restaurantId: uuid("restaurant_id")
     .notNull()
@@ -53,7 +54,7 @@ export const reservationSetting = pgTable("reservation_settings", {
 });
 
 export const serviceWindow = pgTable("service_windows", {
-  id: uuid("id").primaryKey(),
+  id: uuid("id").primaryKey().default(sql`pg_catalog.gen_random_uuid()`),
 
   reservationSettingId: uuid("reservation_setting_id")
     .notNull()
@@ -84,7 +85,7 @@ export const reservationSettingRelations = defineRelations(
 export const status = pgEnum("reservation_status", ["CONFIRMED", "CANCELLED"]);
 
 export const reservation = pgTable("reservations", {
-  id: uuid("id").primaryKey(),
+  id: uuid("id").primaryKey().default(sql`pg_catalog.gen_random_uuid()`),
 
   restaurantId: uuid("restaurant_id")
     .notNull()
@@ -116,7 +117,7 @@ export const daysOfWeekEnum = pgEnum("days_of_week", [
 ]);
 
 export const operatingHour = pgTable("operating_hours", {
-	id: uuid("id").primaryKey(),
+	id: uuid("id").primaryKey().default(sql`pg_catalog.gen_random_uuid()`),
 
 	restaurantId: uuid("restaurant_id")
 		.notNull()
@@ -141,7 +142,7 @@ export const favourite = pgTable("favourites", {
 ]);
 
 export const comment = pgTable("comments", {
-  id: uuid("id").primaryKey(),
+  id: uuid("id").primaryKey().default(sql`pg_catalog.gen_random_uuid()`),
 
   restaurantId: uuid("restaurant_id")
 	.notNull()

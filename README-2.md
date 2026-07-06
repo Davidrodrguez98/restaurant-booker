@@ -423,3 +423,4 @@ Confirm availability is restored
 - Email notifications for booking confirmations and cancellations.
 - Online payment integration for booking deposits.
 - Admin panel for restaurant owners to manage availability and view bookings.
+- Pagination for restaurant list and booking history.

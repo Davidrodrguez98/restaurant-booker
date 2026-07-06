@@ -1,4 +1,4 @@
-import { createServer } from "./server";
+import { createServer } from "@/server";
 import { log } from "@repo/logger";
 
 

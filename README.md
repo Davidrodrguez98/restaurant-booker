@@ -15,11 +15,19 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - Ayudar a elegir las tecnologías adeacuadas para el proyecto.
 - Ayudar a cambiar yarn por pnpm en boilerplate de turborepo con docker y resolver errores de este cambio.
 - boilerplate express y next turborepo con docker, better auth, drizzle, supabase y tailwindcss.
+- Arreglar pequeños bugs al generar migraciones de better-auth con drizzle, como la definición de relaciones de la forma v2 de drizzle.
+- Arreglar bug de dependencias circulares con relaciones de drizzle al estar en distintos archivos.
+- Construir repositorios y servicios base para las entidades de la app, como restaurant, reservation, user, review, etc.
 -
 
 ## Cosas útiles
 
 - boilerplate express y next turborepo con docker https://github.com/vercel/turborepo/tree/main/examples/with-docker
+- Flujo de autenticación con better-auth y drizzle:
+  - Front llama a api POST /api/auth/sign-in/email con email y password.
+  - Backend llama a better-auth para validar credenciales y generar un token JWT que devuelve al frontend.
+  - Frontend guarda el token JWT en localStorage y lo envía en la cabecera Authorization de las siguientes peticiones a la API.
+  - Backend valida el token JWT en cada petición y obtiene el usuario autenticado.
 -
 
 # Turborepo Docker starter

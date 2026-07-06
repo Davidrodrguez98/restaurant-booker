@@ -1,9 +1,9 @@
 import { betterAuth } from "better-auth/minimal";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { db } from "../db/db";
+import { db } from "@/db/db";
 import { nextCookies } from "better-auth/next-js";
 import { bearer } from "better-auth/plugins";
-import { user, session, account, verification } from "../db/schemas/auth";
+import { user, session, account, verification } from "@/db/schemas/auth";
 import {
 	restaurant,
 	reservationSetting,
@@ -12,7 +12,7 @@ import {
 	comment,
 	reservation,
 	operatingHour,
-} from "../db/schemas/schema";
+} from "@/db/schemas/schema";
 
 export const auth = betterAuth({
 	database: drizzleAdapter(db, {
