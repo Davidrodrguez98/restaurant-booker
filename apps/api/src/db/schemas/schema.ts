@@ -9,12 +9,12 @@ import {
 	time,
 	date,
 	timestamp,
-	primaryKey
+	primaryKey,
 } from "drizzle-orm/pg-core";
 import {
 	InferInsertModel,
 	InferSelectModel,
-	defineRelations,
+	relations,
 	sql,
 } from "drizzle-orm";
 
@@ -28,7 +28,9 @@ export const cuisineTypeEnum = pgEnum("cuisine_type", [
 ]);
 
 export const restaurant = pgTable("restaurants", {
-	id: uuid("id").primaryKey().default(sql`pg_catalog.gen_random_uuid()`),
+	id: uuid("id")
+		.primaryKey()
+		.default(sql`pg_catalog.gen_random_uuid()`),
 	name: varchar("name", { length: 100 }).notNull(),
 	description: text("description").notNull(),
 	address: varchar("address", { length: 255 }).notNull(),
@@ -42,53 +44,61 @@ export const restaurant = pgTable("restaurants", {
 });
 
 export const reservationSetting = pgTable("reservation_settings", {
-  id: uuid("id").primaryKey().default(sql`pg_catalog.gen_random_uuid()`),
+	id: uuid("id")
+		.primaryKey()
+		.default(sql`pg_catalog.gen_random_uuid()`),
 
-  restaurantId: uuid("restaurant_id")
-    .notNull()
-    .references(() => restaurant.id, { onDelete: "cascade" }),
+	restaurantId: uuid("restaurant_id")
+		.references(() => restaurant.id, { onDelete: "cascade" }),
 
-  slotIntervalMinutes: integer("slot_interval_minutes").notNull(),
+	slotIntervalMinutes: integer("slot_interval_minutes").notNull(),
 
-  defaultSlotCapacity: integer("default_slots_capacity").notNull(),
+	defaultSlotCapacity: integer("default_slots_capacity").notNull(),
 });
 
 export const serviceWindow = pgTable("service_windows", {
-  id: uuid("id").primaryKey().default(sql`pg_catalog.gen_random_uuid()`),
+	id: uuid("id")
+		.primaryKey()
+		.default(sql`pg_catalog.gen_random_uuid()`),
 
-  reservationSettingId: uuid("reservation_setting_id")
-    .notNull()
-    .references(() => reservationSetting.id, { onDelete: "cascade" }),
+	reservationSettingId: uuid("reservation_setting_id")
+		.notNull()
+		.references(() => reservationSetting.id, { onDelete: "cascade" }),
 
-  name: varchar("name", { length: 10 }).notNull(),
+	name: varchar("name", { length: 10 }).notNull(),
 
-  start: time("start").notNull(),
+	start: time("start").notNull(),
 
-  end: time("end").notNull(),
+	end: time("end").notNull(),
 });
 
-export const reservationStatus = pgEnum("reservation_status", ["CONFIRMED", "CANCELLED"]);
+export const reservationStatus = pgEnum("reservation_status", [
+	"CONFIRMED",
+	"CANCELLED",
+]);
 
 export const reservation = pgTable("reservations", {
-  id: uuid("id").primaryKey().default(sql`pg_catalog.gen_random_uuid()`),
+	id: uuid("id")
+		.primaryKey()
+		.default(sql`pg_catalog.gen_random_uuid()`),
 
-  restaurantId: uuid("restaurant_id")
-    .notNull()
-    .references(() => restaurant.id, { onDelete: "cascade" }),
+	restaurantId: uuid("restaurant_id")
+		.notNull()
+		.references(() => restaurant.id, { onDelete: "cascade" }),
 
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
+	userId: uuid("user_id")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade" }),
 
-  reservationDate: date("reservation_date").notNull(),
+	reservationDate: date("reservation_date").notNull(),
 
-  reservationTime: time("reservation_time").notNull(),
+	reservationTime: time("reservation_time").notNull(),
 
-  partySize: integer("party_size").notNull(),
+	partySize: integer("party_size").notNull(),
 
-  status: reservationStatus("status").notNull(),
+	status: reservationStatus("status").notNull(),
 
-  createdAt: timestamp("created_at").notNull(),
+	createdAt: timestamp("created_at").notNull(),
 });
 
 export const daysOfWeekEnum = pgEnum("days_of_week", [
@@ -102,7 +112,9 @@ export const daysOfWeekEnum = pgEnum("days_of_week", [
 ]);
 
 export const operatingHour = pgTable("operating_hours", {
-	id: uuid("id").primaryKey().default(sql`pg_catalog.gen_random_uuid()`),
+	id: uuid("id")
+		.primaryKey()
+		.default(sql`pg_catalog.gen_random_uuid()`),
 
 	restaurantId: uuid("restaurant_id")
 		.notNull()
@@ -115,115 +127,113 @@ export const operatingHour = pgTable("operating_hours", {
 	closeTime: time("close_time").notNull(),
 });
 
-export const favourite = pgTable("favourites", {
-	userId: uuid("user_id")
-		.notNull()
-		.references(() => user.id, { onDelete: "cascade" }),
+export const favourite = pgTable(
+	"favourites",
+	{
+		userId: uuid("user_id")
+			.notNull()
+			.references(() => user.id, { onDelete: "cascade" }),
+		restaurantId: uuid("restaurant_id")
+			.notNull()
+			.references(() => restaurant.id, { onDelete: "cascade" }),
+	},
+	(table) => [primaryKey({ columns: [table.userId, table.restaurantId] })],
+);
+
+export const comment = pgTable("comments", {
+	id: uuid("id")
+		.primaryKey()
+		.default(sql`pg_catalog.gen_random_uuid()`),
+
 	restaurantId: uuid("restaurant_id")
 		.notNull()
 		.references(() => restaurant.id, { onDelete: "cascade" }),
-}, (table) => [
-	primaryKey({ columns: [table.userId, table.restaurantId] }),
-]);
 
-export const comment = pgTable("comments", {
-  id: uuid("id").primaryKey().default(sql`pg_catalog.gen_random_uuid()`),
+	userId: uuid("user_id")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade" }),
 
-  restaurantId: uuid("restaurant_id")
-	.notNull()
-	.references(() => restaurant.id, { onDelete: "cascade" }),
+	rating: integer("rating").notNull(),
 
-  userId: uuid("user_id")
-	.notNull()
-	.references(() => user.id, { onDelete: "cascade" }),
+	body: text("body").notNull(),
 
-  rating: integer("rating").notNull(),
-
-  body: text("body").notNull(),
-
-  createdAt: timestamp("created_at").notNull(),
+	createdAt: timestamp("created_at").notNull(),
 });
 
-export const restaurantRelations = defineRelations(
-  {
-    restaurant,
-    reservationSetting,
-    operatingHour,
-    comment,
-    reservation,
-    favourite,
-	serviceWindow,
-  },
-  (r) => ({
-    restaurant: {
-      reservationSetting: r.one.reservationSetting({
-        from: r.restaurant.id,
-        to: r.reservationSetting.restaurantId,
-      }),
-      operatingHours: r.many.operatingHour({
-        from: r.restaurant.id,
-        to: r.operatingHour.restaurantId,
-      }),
-      comments: r.many.comment({
-        from: r.restaurant.id,
-        to: r.comment.restaurantId,
-      }),
-      reservations: r.many.reservation({
-        from: r.restaurant.id,
-        to: r.reservation.restaurantId,
-      }),
-      favourites: r.many.favourite({
-        from: r.restaurant.id,
-        to: r.favourite.restaurantId,
-      }),
-    },
-	reservationSetting: {
-	  restaurant: r.one.restaurant({
-		from: r.reservationSetting.restaurantId,
-		to: r.restaurant.id,
-	  }),
-	  serviceWindows: r.many.serviceWindow({
-		from: r.reservationSetting.id,
-		to: r.serviceWindow.reservationSettingId,
-	  }),
-	},
-	serviceWindow: {
-	  reservationSetting: r.one.reservationSetting({
-		from: r.serviceWindow.reservationSettingId,
-		to: r.reservationSetting.id,
-	  }),
-	},
-	operatingHour: {
-	  restaurant: r.one.restaurant({
-		from: r.operatingHour.restaurantId,
-		to: r.restaurant.id,
-	  }),
-	},
-	comment: {
-	  restaurant: r.one.restaurant({
-		from: r.comment.restaurantId,
-		to: r.restaurant.id,
-	  }),
-	},
-	reservation: {
-	  restaurant: r.one.restaurant({
-		from: r.reservation.restaurantId,
-		to: r.restaurant.id,
-	  }),
-	},
-	favourite: {
-	  restaurant: r.many.restaurant({
-		from: r.favourite.restaurantId,
-		to: r.restaurant.id,
-	  }),
-	}
-  }),
+export const restaurantRelations = relations(restaurant, ({ one, many }) => ({
+	reservationSetting: one(reservationSetting),
+	operatingHours: many(operatingHour),
+	comments: many(comment),
+	reservations: many(reservation),
+	favourites: many(favourite),
+}));
+
+export const reservationSettingRelations = relations(
+	reservationSetting,
+	({ one, many }) => ({
+		restaurant: one(restaurant, {
+			fields: [reservationSetting.restaurantId],
+			references: [restaurant.id],
+		}),
+		serviceWindows: many(serviceWindow),
+	}),
 );
+
+export const serviceWindowRelations = relations(serviceWindow, ({ one }) => ({
+	reservationSetting: one(reservationSetting, {
+		fields: [serviceWindow.reservationSettingId],
+		references: [reservationSetting.id],
+	}),
+}));
+
+export const operatingHourRelations = relations(operatingHour, ({ one }) => ({
+	restaurant: one(restaurant, {
+		fields: [operatingHour.restaurantId],
+		references: [restaurant.id],
+	}),
+}));
+
+export const commentRelations = relations(comment, ({ one }) => ({
+	restaurant: one(restaurant, {
+		fields: [comment.restaurantId],
+		references: [restaurant.id],
+	}),
+	user: one(user, {
+		fields: [comment.userId],
+		references: [user.id],
+	}),
+}));
+
+export const reservationRelations = relations(reservation, ({ one }) => ({
+	restaurant: one(restaurant, {
+		fields: [reservation.restaurantId],
+		references: [restaurant.id],
+	}),
+	user: one(user, {
+		fields: [reservation.userId],
+		references: [user.id],
+	}),
+}));
+
+export const favouriteRelations = relations(favourite, ({ one }) => ({
+	restaurant: one(restaurant, {
+		fields: [favourite.restaurantId],
+		references: [restaurant.id],
+	}),
+	user: one(user, {
+		fields: [favourite.userId],
+		references: [user.id],
+	}),
+}));
 
 export type RestaurantSelect = InferSelectModel<typeof restaurant>;
 export type RestaurantInsert = InferInsertModel<typeof restaurant>;
-export type ReservationSettingSelect = InferSelectModel<typeof reservationSetting>;
-export type ReservationSettingInsert = InferInsertModel<typeof reservationSetting>;
+export type ReservationSettingSelect = InferSelectModel<
+	typeof reservationSetting
+>;
+export type ReservationSettingInsert = InferInsertModel<
+	typeof reservationSetting
+>;
 export type ServiceWindowSelect = InferSelectModel<typeof serviceWindow>;
 export type ServiceWindowInsert = InferInsertModel<typeof serviceWindow>;
 export type ReservationSelect = InferSelectModel<typeof reservation>;
