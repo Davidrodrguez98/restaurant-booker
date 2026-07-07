@@ -1,9 +1,15 @@
 import { Router } from "express";
+import { z } from "zod";
 
 import { requireAuth } from "@/utils/middleware";
 import { favouriteService } from "@/services/favourite-service";
+import { sendRouteError, validateRequest } from "@/utils/validation";
 
 export const favouriteRouter: Router = Router();
+
+const restaurantIdParamsSchema = z.object({
+	restaurantId: z.guid(),
+});
 
 favouriteRouter.use(requireAuth);
 
@@ -32,10 +38,7 @@ favouriteRouter.get("", (req, res) => {
 	return favouriteService
 		.getMyFavourites(req.session!.user.id)
 		.then((favourites) => res.json(favourites))
-		.catch((err) => {
-			console.error("Error fetching favourites:", err);
-			res.status(err.status || 500).json({ error: err.message });
-		});
+		.catch((err) => sendRouteError(res, err, 500, "Error fetching favourites"));
 });
 
 /**
@@ -79,22 +82,16 @@ favouriteRouter.get("", (req, res) => {
  *       401:
  *         description: Unauthorized.
  */
-favouriteRouter.post("/:restaurantId", (req, res) => {
+favouriteRouter.post("/:restaurantId", validateRequest({ params: restaurantIdParamsSchema }), (req, res) => {
 	return favouriteService
 		.addFavourite(req.session!.user.id, req.params.restaurantId)
 		.then((favourite) => res.status(201).json(favourite))
-		.catch((err) => {
-			console.error("Error adding favourite:", err);
-			res.status(err.status || 400).json({ error: err.message });
-		});
+		.catch((err) => sendRouteError(res, err, 400, "Error adding favourite"));
 });
 
-favouriteRouter.delete("/:restaurantId", (req, res) => {
+favouriteRouter.delete("/:restaurantId", validateRequest({ params: restaurantIdParamsSchema }), (req, res) => {
 	return favouriteService
 		.removeFavourite(req.session!.user.id, req.params.restaurantId)
 		.then(() => res.status(204).send())
-		.catch((err) => {
-			console.error("Error removing favourite:", err);
-			res.status(404).json({ error: err.message });
-		});
+		.catch((err) => sendRouteError(res, err, 404, "Error removing favourite"));
 });

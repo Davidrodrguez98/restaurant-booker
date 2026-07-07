@@ -1,9 +1,22 @@
 import { Router } from "express";
+import { z } from "zod";
 
 import { requireAuth } from "@/utils/middleware";
 import { reservationService } from "@/services/reservation-service";
+import { sendRouteError, validateRequest } from "@/utils/validation";
 
 export const reservationRouter: Router = Router();
+
+const reservationIdParamsSchema = z.object({
+	reservationId: z.guid(),
+});
+
+const createReservationSchema = z.object({
+	restaurantId: z.guid(),
+	reservationDate: z.iso.date(),
+	reservationTime: z.iso.time({ precision: -1 }),
+	partySize: z.number().int().positive(),
+});
 
 reservationRouter.use(requireAuth);
 
@@ -142,41 +155,29 @@ reservationRouter.use(requireAuth);
  */
 
 reservationRouter
-	.post("", (req, res) => {
+	.post("", validateRequest({ body: createReservationSchema }), (req, res) => {
 		return reservationService
 			.createReservation(req.session!.user.id, req.body)
 			.then((reservation) => res.status(201).json(reservation))
-			.catch((err) => {
-				console.error("Error creating reservation:", err);
-				res.status(err.status || 400).json({ error: err.message });
-			});
+			.catch((err) => sendRouteError(res, err, 400, "Error creating reservation"));
 	})
 	.get("/me", (req, res) => {
 		return reservationService
 			.getMyReservations(req.session!.user.id)
 			.then((reservations) => res.json(reservations))
-			.catch((err) => {
-				console.error("Error fetching reservations:", err);
-				res.status(err.status || 500).json({ error: err.message });
-			});
+			.catch((err) => sendRouteError(res, err, 500, "Error fetching reservations"));
 	})
-	.get("/:reservationId", (req, res) => {
+	.get("/:reservationId", validateRequest({ params: reservationIdParamsSchema }), (req, res) => {
 		const { reservationId } = req.params;
 		return reservationService
 			.getReservationById(reservationId)
 			.then((reservation) => res.json(reservation))
-			.catch((err) => {
-				console.error("Error fetching reservation:", err);
-				res.status(err.status || 404).json({ error: err.message });
-			});
+			.catch((err) => sendRouteError(res, err, 404, "Error fetching reservation"));
 	})
-	.patch("/:reservationId/cancel", (req, res) => {
+	.patch("/:reservationId/cancel", validateRequest({ params: reservationIdParamsSchema }), (req, res) => {
 		const { reservationId } = req.params;
 		return reservationService
 			.cancelReservation(reservationId, req.session!.user.id)
 			.then((reservation) => res.json(reservation))
-			.catch((err) => {
-				console.error("Error cancelling reservation:", err);
-				res.status(err.status || 400).json({ error: err.message });
-			});
+			.catch((err) => sendRouteError(res, err, 400, "Error cancelling reservation"));
 	});

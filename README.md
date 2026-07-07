@@ -29,7 +29,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
   - Backend llama a better-auth para validar credenciales y generar un token JWT que devuelve al frontend.
   - Frontend guarda el token JWT en localStorage y lo envía en la cabecera Authorization de las siguientes peticiones a la API.
   - Backend valida el token JWT en cada petición y obtiene el usuario autenticado.
--
+- `bun run ./apps/api/src/db/seed.ts` para ejecutar las migraciones
 
 # Turborepo Docker starter
 

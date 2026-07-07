@@ -1,9 +1,29 @@
 import { Router } from "express";
+import { z } from "zod";
 
 import { requireAuth } from "@/utils/middleware";
 import { commentService } from "@/services/comment-service";
+import { sendRouteError, validateRequest } from "@/utils/validation";
 
 export const commentRouter: Router = Router();
+
+const restaurantIdParamsSchema = z.object({
+  restaurantId: z.guid(),
+});
+
+const commentIdParamsSchema = z.object({
+  commentId: z.guid(),
+});
+
+const createCommentSchema = z.object({
+  rating: z.number().int().min(1).max(5),
+  body: z.string().trim().min(1).max(2000),
+});
+
+const updateCommentSchema = createCommentSchema.partial().refine(
+  (data) => Object.keys(data).length > 0,
+  { message: "At least one field is required" },
+);
 
 commentRouter.use(requireAuth);
 
@@ -135,43 +155,47 @@ commentRouter.use(requireAuth);
  */
 
 commentRouter
-  .get("/restaurants/:restaurantId/comments", (req, res) => {
+  .get(
+    "/restaurants/:restaurantId/comments",
+    validateRequest({ params: restaurantIdParamsSchema }),
+    (req, res) => {
     const { restaurantId } = req.params;
     return commentService
       .getRestaurantComments(restaurantId)
       .then((comments) => res.json(comments))
-      .catch((err) => {
-        console.error("Error fetching comments:", err);
-        res.status(err.status || 404).json({ error: err.message });
-      });
-  })
-  .post("/restaurants/:restaurantId/comments", (req, res) => {
+      .catch((err) => sendRouteError(res, err, 404, "Error fetching comments"));
+    },
+  )
+  .post(
+    "/restaurants/:restaurantId/comments",
+    validateRequest({ params: restaurantIdParamsSchema, body: createCommentSchema }),
+    (req, res) => {
     const { restaurantId } = req.params;
     return commentService
       .createComment(restaurantId, req.session!.user.id, req.body)
       .then((comment) => res.status(201).json(comment))
-      .catch((err) => {
-        console.error("Error creating comment:", err);
-        res.status(err.status || 400).json({ error: err.message });
-      });
-  })
-  .patch("/comments/:commentId", (req, res) => {
+      .catch((err) => sendRouteError(res, err, 400, "Error creating comment"));
+    },
+  )
+  .patch(
+    "/comments/:commentId",
+    validateRequest({ params: commentIdParamsSchema, body: updateCommentSchema }),
+    (req, res) => {
     const { commentId } = req.params;
     return commentService
       .updateComment(commentId, req.session!.user.id, req.body)
       .then((comment) => res.json(comment))
-      .catch((err) => {
-        console.error("Error updating comment:", err);
-        res.status(err.status || 400).json({ error: err.message });
-      });
-  })
-  .delete("/comments/:commentId", (req, res) => {
+      .catch((err) => sendRouteError(res, err, 400, "Error updating comment"));
+    },
+  )
+  .delete(
+    "/comments/:commentId",
+    validateRequest({ params: commentIdParamsSchema }),
+    (req, res) => {
     const { commentId } = req.params;
     return commentService
       .deleteComment(commentId, req.session!.user.id)
       .then(() => res.status(204).send())
-      .catch((err) => {
-        console.error("Error deleting comment:", err);
-        res.status(err.status || 400).json({ error: err.message });
-      });
-  });
+      .catch((err) => sendRouteError(res, err, 400, "Error deleting comment"));
+    },
+  );

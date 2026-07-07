@@ -21,6 +21,12 @@ export class ReservationService {
     return this.repository.createReservation(userId, data);
   }
 
+  async getAvailability(restaurantId: string, date: string, partySize: number) {
+    await ensureRestaurantExists(restaurantId, this.restaurants);
+
+    return this.repository.getAvailability(restaurantId, date, partySize);
+  }
+
   async getMyReservations(userId: string) {
     return this.repository.getReservationsByUserId(userId);
   }
