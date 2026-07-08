@@ -16,7 +16,7 @@ if (!databaseUrl) {
 const db = drizzle(databaseUrl);
 
 async function main() {
-	const RESTAURANT_COUNT = 4;
+	const RESTAURANT_COUNT = 15;
 
 	await reset(db, authSchema);
 	await reset(db, appSchema);
@@ -88,7 +88,7 @@ async function main() {
 				cuisineType: f.valuesFromArray({
 					values: ["ASIAN", "PIZZA", "AMERICAN", "MEXICAN"],
 				}),
-				rating: f.number({ minValue: 4, maxValue: 5, precision: 100 }),
+				rating: f.number({ minValue: 1, maxValue: 5, precision: 100 }),
 				latitude: f.number({ minValue: 34, maxValue: 35, precision: 1000 }),
 				longitude: f.number({
 					minValue: -118,
@@ -110,7 +110,7 @@ async function main() {
 				defaultSlotCapacity: f.valuesFromArray({ values: [5, 10, 15] }),
 			},
 			with: {
-				serviceWindow: 2
+				serviceWindow: 1
 			}
 		},
 		reservation: {
@@ -135,19 +135,19 @@ async function main() {
 		serviceWindow: {
 			columns: {
 				name: f.valuesFromArray({
-					values: ["Lunch", "Dinner"],
+					values: ["Lunch"],
 				}),
 				start: f.valuesFromArray({
-					values: ["11:00", "17:00"],
+					values: ["11:00", "12:00"],
 				}),
 				end: f.valuesFromArray({
-					values: ["15:00", "22:00"],
+					values: ["14:00", "17:00"],
 				}),
 			},
 		},
 		comment: {
 			columns: {
-				rating: f.int({ minValue: 4, maxValue: 5 }),
+				rating: f.int({ minValue: 1, maxValue: 5 }),
 				body: f.loremIpsum({
 					sentencesCount: 1
 				}),

@@ -5,7 +5,12 @@ import { favourite } from "@/db/schemas/schema";
 
 export class FavouriteRepository {
 	async getByUserId(userId: string) {
-		return db.select().from(favourite).where(eq(favourite.userId, userId));
+		return db.query.favourite.findMany({
+			where: eq(favourite.userId, userId),
+			with: {
+				restaurant: true,
+			},
+		});
 	}
 
 	async getByUserIdAndRestaurantId(userId: string, restaurantId: string) {
