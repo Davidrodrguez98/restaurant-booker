@@ -25,6 +25,7 @@ export default function HomePage() {
 	const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
 	const [favouriteIds, setFavouriteIds] = useState<Set<string>>(new Set());
 	const [cuisine, setCuisine] = useState<string>("ALL");
+	const [favouritesOnly, setFavouritesOnly] = useState(false);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<unknown>(null);
@@ -86,6 +87,9 @@ export default function HomePage() {
 
 	const filteredRestaurants = useMemo(() => {
 		let filtered = restaurants;
+		if (favouritesOnly) {
+			filtered = filtered.filter((r) => favouriteIds.has(r.id));
+		}
 		if (cuisine !== "ALL") {
 			filtered = filtered.filter((r) => r.cuisineType === cuisine);
 		}
@@ -99,7 +103,7 @@ export default function HomePage() {
 			);
 		}
 		return filtered;
-	}, [restaurants, cuisine, searchTerm]);
+	}, [restaurants, favouriteIds, favouritesOnly, cuisine, searchTerm]);
 
 	if (authLoading || !isAuthenticated) {
 		return (
@@ -165,8 +169,20 @@ export default function HomePage() {
 							<span className="text-sm font-medium text-muted-foreground whitespace-nowrap">
 								Cuisine:
 							</span>
+							<button
+								type="button"
+								onClick={() => setFavouritesOnly((prev) => !prev)}
+								className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium transition border ${
+									favouritesOnly
+										? "bg-primary text-primary-foreground border-primary"
+										: "bg-background text-foreground border-border hover:bg-muted"
+								}`}
+							>
+								My Favourites
+							</button>
 							{CUISINES.map((type) => (
 								<button
+									type="button"
 									key={type}
 									onClick={() => setCuisine(type)}
 									className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium transition ${
@@ -203,7 +219,9 @@ export default function HomePage() {
 					) : filteredRestaurants.length === 0 ? (
 						<div className="text-center py-12">
 							<p className="text-muted-foreground text-lg">
-								No restaurants found
+								{favouritesOnly
+									? "No favourite restaurants found"
+									: "No restaurants found"}
 							</p>
 						</div>
 					) : (

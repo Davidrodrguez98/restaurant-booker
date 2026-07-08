@@ -43,7 +43,7 @@ async function main() {
 				}),
 				image: f.valuesFromArray({
 					values: [
-						"/images/avatar-1.png",
+						"https://picsum.photos/300",
 					],
 				}),
 				emailVerified: f.boolean(),
@@ -79,10 +79,7 @@ async function main() {
 				}),
 				image: f.valuesFromArray({
 					values: [
-						"/images/restaurant-1.jpg",
-						"/images/restaurant-2.jpg",
-						"/images/restaurant-3.jpg",
-						"/images/restaurant-4.jpg",
+						"https://picsum.photos/800",
 					],
 				}),
 				cuisineType: f.valuesFromArray({

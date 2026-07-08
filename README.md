@@ -29,8 +29,23 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
   - Backend llama a better-auth para validar credenciales y generar un token JWT que devuelve al frontend.
   - Frontend guarda el token JWT en localStorage y lo envía en la cabecera Authorization de las siguientes peticiones a la API.
   - Backend valida el token JWT en cada petición y obtiene el usuario autenticado.
-- `bun run ./apps/api/src/db/seed.ts` para ejecutar las migraciones.
 - Se devuelve el objeto restaurant en el endpoint de GET favourites, para no tener que hacer otra llamada a la API para obtener los datos del restaurant ni hacer el filtrado en frontal, ya que había pensado que justo al iniciar sesión se haría un get de todos los restaurantes y guardarlos en un store, pero puede ser que el usuario acceda directamente a otra vista que no sea en la que se hace este GET o que en un futuro se paginen los restaurantes y no se tengan todos en el store, por lo que es mejor devolver el restaurant en el endpoint de favourites.
+- en el formulario de creacion de restaurantes se ha dejado el campo image sin validación en frontal para demostrar que se manejan correctamente los errores que provienen del backend.
+
+## Pasos para correr la app en local
+
+- Instalar dependencias: `pnpm install`
+- Crear un archivo `.env` en
+  - `apps/api` con las variables de entorno:
+    - `DATABASE_URL`
+    - `DATABASE_URL_UNPOOLED`
+    - `BETTER_AUTH_SECRET`
+    - `BETTER_AUTH_URL`
+  - `apps/web` con las variables de entorno:
+    - `NEXT_PUBLIC_API_URL`
+- Se pueden ejecutar las migraciones de la base de datos y los seeders con: `cd apps/api && bun run ./src/db/seed.ts` (instalar `bun` si no está instalado desde https://bun.sh/), pero como es una base de datos persistente, no es necesario ejecutarlo porque ya están ejecutadas.
+- Correr la app en modo desarrollo desde la raíz del monorepo: `pnpm run dev`
+- Abrir http://localhost:3000 en el navegador. Utilizar las credenciales de prueba para iniciar sesión: `email: test@test.com`, `password: 12345678`.
 
 # Turborepo Docker starter
 
