@@ -43,6 +43,8 @@ commentRouter.use(requireAuth);
  *         userId:
  *           type: string
  *           format: uuid
+ *         fullName:
+ *           type: string
  *         rating:
  *           type: integer
  *         body:

@@ -421,8 +421,11 @@ Confirm availability is restored
 ## 15. Future improvements
 
 - Email notifications for booking confirmations and cancellations.
-- Online payment integration for booking deposits.
-- Admin panel for restaurant owners to manage availability and view bookings.
-- Pagination for restaurant list and booking history.
-- Filtering and sorting options for restaurants (e.g., by cuisine, rating, distance).
-- When app is deployed, a static IP must be configured and included in a white list in the database configuration.
+- Online payment integration for booking deposits with Stripe.
+- Role-based access control and admin panel for restaurant owners to manage availability and view bookings.
+- Pagination for restaurant list, comments and booking history.
+- Server-side filtering and sorting options for restaurants.
+- When app is deployed, a static IP must be configured and included in a white list in the database configuration in order to allow access only from that IP.
+- Edit reservation settings and service windows for restaurants.
+- Add i18n support for multiple languages and locales.
+- Restaurant map integration with Google Maps or OpenStreetMap for location display and directions using latitude and longitude fields.

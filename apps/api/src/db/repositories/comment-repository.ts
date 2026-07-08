@@ -1,15 +1,44 @@
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, getTableColumns } from "drizzle-orm";
 
 import { db } from "@/db/db";
-import { comment, type CommentInsert } from "@/db/schemas/schema";
+import { user } from "@/db/schemas/auth";
+import {
+  comment,
+  type CommentInsert,
+  type CommentSelect,
+} from "@/db/schemas/schema";
+
+export type CommentWithAuthor = CommentSelect & {
+  fullName: string;
+};
+
+const commentColumns = getTableColumns(comment);
 
 export class CommentRepository {
   async getCommentsByRestaurantId(restaurantId: string) {
     return db
-      .select()
+      .select({
+        ...commentColumns,
+        fullName: user.name,
+      })
       .from(comment)
+      .innerJoin(user, eq(comment.userId, user.id))
       .where(eq(comment.restaurantId, restaurantId))
       .orderBy(desc(comment.createdAt));
+  }
+
+  private async getCommentWithAuthorById(commentId: string) {
+    const [result] = await db
+      .select({
+        ...commentColumns,
+        fullName: user.name,
+      })
+      .from(comment)
+      .innerJoin(user, eq(comment.userId, user.id))
+      .where(eq(comment.id, commentId))
+      .limit(1);
+
+    return result ?? null;
   }
 
   async getCommentById(commentId: string) {
@@ -35,9 +64,15 @@ export class CommentRepository {
         createdAt: new Date(),
         ...data,
       })
-      .returning();
+      .returning({ id: comment.id });
 
-    return created;
+    const commentWithAuthor = await this.getCommentWithAuthorById(created.id);
+
+    if (!commentWithAuthor) {
+      throw new Error("Unable to load created comment");
+    }
+
+    return commentWithAuthor;
   }
 
   async updateComment(
@@ -48,9 +83,13 @@ export class CommentRepository {
       .update(comment)
       .set(data)
       .where(eq(comment.id, commentId))
-      .returning();
+      .returning({ id: comment.id });
 
-    return updated ?? null;
+    if (!updated) {
+      return null;
+    }
+
+    return this.getCommentWithAuthorById(updated.id);
   }
 
   async deleteComment(commentId: string) {
