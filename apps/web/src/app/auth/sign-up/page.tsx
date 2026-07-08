@@ -61,7 +61,7 @@ export default function SignUpPage() {
 							Create Account
 						</h1>
 						<p className="text-center text-muted-foreground mt-2">
-							Join TableBook and discover amazing restaurants
+							Join Restaurant Booker and discover amazing restaurants
 						</p>
 					</div>
 
