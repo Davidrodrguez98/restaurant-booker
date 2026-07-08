@@ -1,11 +1,11 @@
 import { drizzle } from "drizzle-orm/postgres-js";
-import { config } from "dotenv";
 import postgres from "postgres";
 
 import * as authSchema from "@/db/schemas/auth";
 import * as appSchema from "@/db/schemas/schema";
+import { loadEnv } from "@/utils/load-env";
 
-config({ path: ".env" });
+loadEnv();
 
 const transactionDatabaseUrl =
 	process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL;

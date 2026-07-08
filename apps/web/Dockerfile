@@ -10,6 +10,9 @@ ENV PATH="$PNPM_HOME:$PNPM_HOME/bin:$PATH"
 WORKDIR /app
 RUN mkdir -p "$PNPM_HOME/bin" && corepack enable && corepack prepare pnpm@11.9.0 --activate
 
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 # ---
 FROM base AS prepare
 RUN pnpm add --global turbo@2.10.2
@@ -26,6 +29,9 @@ RUN pnpm install --frozen-lockfile
 # Build the project
 COPY --from=prepare /app/out/full/ .
 
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 # Uncomment and use build args to enable remote caching
 # ARG TURBO_TEAM
 # ENV TURBO_TEAM=$TURBO_TEAM
@@ -41,6 +47,8 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
 # Don't run production as root for security reasons
 RUN addgroup --system --gid 1001 nodejs

@@ -1,8 +1,8 @@
-# Restaurant Booker - Technical Implementation Documentation
+# Restaurant Booker - Documentation
 
 ## 1. Project Overview
 
-Restaurant Booker is a full-stack web application for managing restaurant table reservations. The target product allows users to browse restaurants, check table availability, create bookings, review their reservations, cancel bookings, save favourite restaurants, and leave reviews after visiting a restaurant.
+Restaurant Booker is a full-stack web application for managing restaurant table reservations. The target product allows users to browse restaurants, check table availability, create bookings, cancel bookings, save favourite restaurants, and leave reviews after visiting a restaurant.
 
 This repository is based on the Turborepo `with-docker` boilerplate and has been adapted as the foundation for a technical test. The project is intentionally split into a frontend and a backend so each part can evolve independently while still sharing tooling, configuration, and packages inside one monorepo.
 
@@ -18,7 +18,7 @@ Reasons for this choice:
 - Shared packages avoid duplicated configuration and utilities.
 - Build, lint, and test tasks can be orchestrated from the root.
 - Turborepo caching helps reduce repeated work in local development and CI.
-- The structure is close to what many production teams use for multi-app JavaScript/TypeScript projects.
+- The structure is close to what many production teams use.
 
 ### Next.js for the Frontend
 
@@ -41,7 +41,6 @@ Reasons for this choice:
 - Express is simple, mature, and widely understood.
 - It is easy to expose REST endpoints consumed by the Next.js frontend.
 - It keeps the API independent from the frontend framework.
-- It is suitable for a technical test because the backend behavior is explicit and easy to review.
 - It leaves room to add authentication, validation, persistence, and domain services without coupling them to Next.js.
 
 Clarification: I would have used Next.js for both frontend and backend; however, given the context of the technical test, I understand that a separate backend and frontend are required, so I decided to use Express.js for the backend.

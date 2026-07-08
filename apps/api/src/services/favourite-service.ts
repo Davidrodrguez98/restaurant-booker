@@ -1,6 +1,8 @@
 import {
 	favouriteRepository,
 	FavouriteRepository,
+	favouriteRepository,
+	FavouriteRepository,
 } from "../db/repositories/favourite-repository";
 import {
 	restaurantRepository,

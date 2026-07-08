@@ -5,16 +5,20 @@ import { ReservationService } from "../reservation-service";
 describe("ReservationService", () => {
 	it("creates a reservation for an existing restaurant", async () => {
 		const mockRestaurantRepository = {
-			getById: jest.fn().mockResolvedValue({ id: "restaurant-1" }),
+			getById: jest
+				.fn()
+				.mockImplementation(() => Promise.resolve({ id: "restaurant-1" })),
 		};
 
 		const mockReservationRepository = {
-			createReservation: jest.fn().mockResolvedValue({
-				id: "reservation-1",
-				restaurantId: "restaurant-1",
-				userId: "user-1",
-				status: "CONFIRMED",
-			}),
+			createReservation: jest.fn().mockImplementation(() =>
+				Promise.resolve({
+					id: "reservation-1",
+					restaurantId: "restaurant-1",
+					userId: "user-1",
+					status: "CONFIRMED",
+				}),
+			),
 			getReservationsByUserId: jest.fn(),
 			getReservationById: jest.fn(),
 			cancelReservation: jest.fn(),
@@ -47,14 +51,18 @@ describe("ReservationService", () => {
 
 	it("returns availability slots for a given restaurant, date, and party size", async () => {
 		const mockRestaurantRepository = {
-			getById: jest.fn().mockResolvedValue({ id: "restaurant-1" }),
+			getById: jest
+				.fn()
+				.mockImplementation(() => Promise.resolve({ id: "restaurant-1" })),
 		};
 
 		const mockReservationRepository = {
-			getAvailability: jest.fn().mockResolvedValue([
-				{ time: "13:00", available: true, remainingCapacity: 4, capacity: 4 },
-				{ time: "13:30", available: false, remainingCapacity: 2, capacity: 4 },
-			]),
+			getAvailability: jest.fn().mockImplementation(() =>
+				Promise.resolve([
+					{ time: "13:00", available: true, remainingCapacity: 4, capacity: 4 },
+					{ time: "13:30", available: false, remainingCapacity: 2, capacity: 4 },
+				]),
+			),
 		};
 
 		const service = new ReservationService(
@@ -83,11 +91,15 @@ describe("ReservationService", () => {
 		conflictError.status = 409;
 
 		const mockRestaurantRepository = {
-			getById: jest.fn().mockResolvedValue({ id: "restaurant-1" }),
+			getById: jest
+				.fn()
+				.mockImplementation(() => Promise.resolve({ id: "restaurant-1" })),
 		};
 
 		const mockReservationRepository = {
-			createReservation: jest.fn().mockRejectedValue(conflictError),
+			createReservation: jest
+				.fn()
+				.mockImplementation(() => Promise.reject(conflictError)),
 			getReservationsByUserId: jest.fn(),
 			getReservationById: jest.fn(),
 			cancelReservation: jest.fn(),
@@ -119,7 +131,9 @@ describe("ReservationService", () => {
 		alreadyCancelledError.status = 409;
 
 		const mockReservationRepository = {
-			cancelReservation: jest.fn().mockRejectedValue(alreadyCancelledError),
+			cancelReservation: jest
+				.fn()
+				.mockImplementation(() => Promise.reject(alreadyCancelledError)),
 			createReservation: jest.fn(),
 			getReservationsByUserId: jest.fn(),
 			getReservationById: jest.fn(),
@@ -145,14 +159,18 @@ describe("ReservationService", () => {
 		conflictError.status = 409;
 
 		const mockRestaurantRepository = {
-			getById: jest.fn().mockResolvedValue({ id: "restaurant-1" }),
+			getById: jest
+				.fn()
+				.mockImplementation(() => Promise.resolve({ id: "restaurant-1" })),
 		};
 
 		const mockReservationRepository = {
 			createReservation: jest
 				.fn()
-				.mockResolvedValueOnce({ id: "reservation-1", status: "CONFIRMED" })
-				.mockRejectedValueOnce(conflictError),
+				.mockImplementationOnce(() =>
+					Promise.resolve({ id: "reservation-1", status: "CONFIRMED" }),
+				)
+				.mockImplementationOnce(() => Promise.reject(conflictError)),
 			getReservationsByUserId: jest.fn(),
 			getReservationById: jest.fn(),
 			cancelReservation: jest.fn(),

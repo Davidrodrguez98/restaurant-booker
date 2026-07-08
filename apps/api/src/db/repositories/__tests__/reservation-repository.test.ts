@@ -13,7 +13,7 @@ function createMockTx(config: MockTxConfig = {}) {
   const insertResults = [...(config.insertResults ?? [])];
   const updateResults = [...(config.updateResults ?? [])];
 
-  const execute = jest.fn().mockResolvedValue([]);
+  const execute = jest.fn().mockImplementation(() => Promise.resolve([]));
   const insertValues = jest.fn();
   const updateSet = jest.fn();
 

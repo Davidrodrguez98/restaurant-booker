@@ -9,7 +9,11 @@ import { RestaurantService } from "../restaurant-service";
 describe("RestaurantService", () => {
 	it("returns all restaurants", async () => {
 		const mockRepository = {
-			getAll: jest.fn().mockResolvedValue([{ id: "restaurant-1", name: "R1" }]),
+			getAll: jest
+				.fn()
+				.mockImplementation(() =>
+					Promise.resolve([{ id: "restaurant-1", name: "R1" }]),
+				),
 		};
 
 		const service = new RestaurantService(mockRepository as any);
@@ -21,8 +25,14 @@ describe("RestaurantService", () => {
 
 	it("updates a restaurant when it exists", async () => {
 		const mockRepository = {
-			getById: jest.fn().mockResolvedValue({ id: "restaurant-1" }),
-			update: jest.fn().mockResolvedValue({ id: "restaurant-1", name: "Updated" }),
+			getById: jest
+				.fn()
+				.mockImplementation(() => Promise.resolve({ id: "restaurant-1" })),
+			update: jest
+				.fn()
+				.mockImplementation(() =>
+					Promise.resolve({ id: "restaurant-1", name: "Updated" }),
+				),
 		};
 
 		const service = new RestaurantService(mockRepository as any);
@@ -39,7 +49,7 @@ describe("RestaurantService", () => {
 
 	it("throws when deleting a restaurant that does not exist", async () => {
 		const mockRepository = {
-			getById: jest.fn().mockResolvedValue(null),
+			getById: jest.fn().mockImplementation(() => Promise.resolve(null)),
 			delete: jest.fn(),
 		};
 
