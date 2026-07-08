@@ -10,6 +10,7 @@ import {
 	date,
 	timestamp,
 	primaryKey,
+	index,
 } from "drizzle-orm/pg-core";
 import {
 	InferInsertModel,
@@ -77,29 +78,45 @@ export const reservationStatus = pgEnum("reservation_status", [
 	"CANCELLED",
 ]);
 
-export const reservation = pgTable("reservations", {
-	id: uuid("id")
-		.primaryKey()
-		.default(sql`pg_catalog.gen_random_uuid()`),
+export const reservation = pgTable(
+	"reservations",
+	{
+		id: uuid("id")
+			.primaryKey()
+			.default(sql`pg_catalog.gen_random_uuid()`),
 
-	restaurantId: uuid("restaurant_id")
-		.notNull()
-		.references(() => restaurant.id, { onDelete: "cascade" }),
+		restaurantId: uuid("restaurant_id")
+			.notNull()
+			.references(() => restaurant.id, { onDelete: "cascade" }),
 
-	userId: uuid("user_id")
-		.notNull()
-		.references(() => user.id, { onDelete: "cascade" }),
+		userId: uuid("user_id")
+			.notNull()
+			.references(() => user.id, { onDelete: "cascade" }),
 
-	reservationDate: date("reservation_date").notNull(),
+		reservationDate: date("reservation_date").notNull(),
 
-	reservationTime: time("reservation_time").notNull(),
+		reservationTime: time("reservation_time").notNull(),
 
-	partySize: integer("party_size").notNull(),
+		partySize: integer("party_size").notNull(),
 
-	status: reservationStatus("status").notNull(),
+		status: reservationStatus("status").notNull(),
 
-	createdAt: timestamp("created_at").notNull(),
-});
+		createdAt: timestamp("created_at").notNull(),
+	},
+	(table) => [
+		index("reservations_slot_status_idx").on(
+			table.restaurantId,
+			table.reservationDate,
+			table.reservationTime,
+			table.status,
+		),
+		index("reservations_slot_idx").on(
+			table.restaurantId,
+			table.reservationDate,
+			table.reservationTime,
+		),
+	],
+);
 
 export const daysOfWeekEnum = pgEnum("days_of_week", [
 	"MONDAY",

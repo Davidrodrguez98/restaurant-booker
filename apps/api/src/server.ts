@@ -6,22 +6,27 @@ import { restaurantRouter } from "@/routers/restaurant-router";
 import { commentRouter } from "@/routers/comment-router";
 import { reservationRouter } from "@/routers/reservation-router";
 import swaggerUi from "swagger-ui-express";
-import swaggerJsdoc from "swagger-jsdoc";
 import { favouriteRouter } from "./routers/favourite-router";
+import { swaggerDocs } from "@/openapi";
 
-const swaggerOptions = {
-  definition: {
-    openapi: "3.0.0",
-    info: {
-      title: "Restaurant Booker API",
-      version: "1.0.0",
-      description: "API for managing restaurants"
-    }
-  },
-  apis: ["./src/routers/*.ts"]
-};
-
-const swaggerDocs = swaggerJsdoc(swaggerOptions);
+/**
+ * @swagger
+ * /api/health:
+ *   get:
+ *     summary: Health check
+ *     tags: [System]
+ *     responses:
+ *       200:
+ *         description: Service is healthy.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: ok
+ */
 
 export const createServer = (): Express => {
 	const app = express();

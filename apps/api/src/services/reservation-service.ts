@@ -44,21 +44,7 @@ export class ReservationService {
   }
 
   async cancelReservation(reservationId: string, userId: string) {
-    const reservation = await this.repository.getReservationById(reservationId);
-
-    if (!reservation) {
-      const error = new Error("Reservation not found") as Error & { status?: number };
-      error.status = 404;
-      throw error;
-    }
-
-    if (reservation.userId !== userId) {
-      const error = new Error("Forbidden") as Error & { status?: number };
-      error.status = 403;
-      throw error;
-    }
-
-    return this.repository.cancelReservation(reservationId);
+    return this.repository.cancelReservation(reservationId, userId);
   }
 }
 

@@ -57,6 +57,19 @@ restaurantRouter.use(requireAuth);
  *           type: string
  *         address:
  *           type: string
+ *         neighborhood:
+ *           type: string
+ *         image:
+ *           type: string
+ *         cuisineType:
+ *           type: string
+ *           enum: [ASIAN, PIZZA, AMERICAN, MEXICAN]
+ *         latitude:
+ *           type: number
+ *         longitude:
+ *           type: number
+ *         rating:
+ *           type: number
  *         capacity:
  *           type: integer
  *       required:
@@ -74,6 +87,17 @@ restaurantRouter.use(requireAuth);
  *           type: string
  *         address:
  *           type: string
+ *         neighborhood:
+ *           type: string
+ *         image:
+ *           type: string
+ *         cuisineType:
+ *           type: string
+ *           enum: [ASIAN, PIZZA, AMERICAN, MEXICAN]
+ *         latitude:
+ *           type: number
+ *         longitude:
+ *           type: number
  *         capacity:
  *           type: integer
  *       required:
@@ -90,6 +114,17 @@ restaurantRouter.use(requireAuth);
  *           type: string
  *         address:
  *           type: string
+ *         neighborhood:
+ *           type: string
+ *         image:
+ *           type: string
+ *         cuisineType:
+ *           type: string
+ *           enum: [ASIAN, PIZZA, AMERICAN, MEXICAN]
+ *         latitude:
+ *           type: number
+ *         longitude:
+ *           type: number
  *         capacity:
  *           type: integer
  *
@@ -105,7 +140,7 @@ restaurantRouter.use(requireAuth);
  *     summary: Get all restaurants
  *     tags: [Restaurants]
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     responses:
  *       200:
  *         description: List of restaurants.
@@ -117,12 +152,22 @@ restaurantRouter.use(requireAuth);
  *                 $ref: '#/components/schemas/Restaurant'
  *       500:
  *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       401:
+ *         description: Unauthorized.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *
  *   post:
  *     summary: Create a restaurant
  *     tags: [Restaurants]
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -138,19 +183,32 @@ restaurantRouter.use(requireAuth);
  *               $ref: '#/components/schemas/Restaurant'
  *       400:
  *         description: Invalid request body.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               oneOf:
+ *                 - $ref: '#/components/schemas/ErrorResponse'
+ *                 - $ref: '#/components/schemas/ValidationErrorResponse'
+ *       401:
+ *         description: Unauthorized.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *
  * /api/restaurants/{id}:
  *   get:
  *     summary: Get a restaurant by ID
  *     tags: [Restaurants]
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: string
+ *           format: uuid
  *     responses:
  *       200:
  *         description: Restaurant found.
@@ -160,18 +218,29 @@ restaurantRouter.use(requireAuth);
  *               $ref: '#/components/schemas/Restaurant'
  *       404:
  *         description: Restaurant not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       400:
+ *         description: Invalid restaurant id.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ValidationErrorResponse'
  *
  *   patch:
  *     summary: Update a restaurant
  *     tags: [Restaurants]
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: string
+ *           format: uuid
  *     requestBody:
  *       required: true
  *       content:
@@ -187,36 +256,60 @@ restaurantRouter.use(requireAuth);
  *               $ref: '#/components/schemas/Restaurant'
  *       404:
  *         description: Restaurant not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       400:
+ *         description: Invalid restaurant id or request body.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               oneOf:
+ *                 - $ref: '#/components/schemas/ErrorResponse'
+ *                 - $ref: '#/components/schemas/ValidationErrorResponse'
  *
  *   delete:
  *     summary: Delete a restaurant
  *     tags: [Restaurants]
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: string
+ *           format: uuid
  *     responses:
  *       204:
  *         description: Restaurant deleted.
  *       404:
  *         description: Restaurant not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       400:
+ *         description: Invalid restaurant id.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ValidationErrorResponse'
  *
  * /api/restaurants/{restaurantId}/availability:
  *   get:
  *     summary: Get availability slots for a restaurant
  *     tags: [Restaurants]
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: restaurantId
  *         required: true
  *         schema:
  *           type: string
+ *           format: uuid
  *       - in: query
  *         name: date
  *         required: true
@@ -249,8 +342,24 @@ restaurantRouter.use(requireAuth);
  *                     type: integer
  *       400:
  *         description: Invalid query parameters.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               oneOf:
+ *                 - $ref: '#/components/schemas/ErrorResponse'
+ *                 - $ref: '#/components/schemas/ValidationErrorResponse'
  *       404:
  *         description: Restaurant not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       401:
+ *         description: Unauthorized.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 
 restaurantRouter

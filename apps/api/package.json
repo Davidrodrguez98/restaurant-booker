@@ -7,13 +7,23 @@
     "clean": "rm -rf dist",
     "dev": "nodemon --exec \"node -r esbuild-register ./src/index.ts\" -e .ts",
     "lint": "tsc --noEmit && eslint \"src/**/*.ts*\" --max-warnings 0",
+    "openapi:export": "tsx src/scripts/export-openapi.ts",
     "seed": "node -r esbuild-register ./src/db/seed.ts",
     "start": "node -r esbuild-register ./src/index.ts",
     "test": "jest --detectOpenHandles"
   },
   "jest": {
     "preset": "@repo/jest-presets/node",
+    "transform": {
+      "^.+\\.[tj]sx?$": "<rootDir>/jest.transformer.cjs"
+    },
     "moduleNameMapper": {
+      "^better-auth/node$": "<rootDir>/src/test-support/mocks/better-auth-node.ts",
+      "^@/utils/auth$": "<rootDir>/src/test-support/mocks/auth.ts",
+      "^@/routers/restaurant-router$": "<rootDir>/src/test-support/mocks/restaurant-router.ts",
+      "^@/routers/comment-router$": "<rootDir>/src/test-support/mocks/comment-router.ts",
+      "^@/routers/reservation-router$": "<rootDir>/src/test-support/mocks/reservation-router.ts",
+      "^\\./routers/favourite-router$": "<rootDir>/src/test-support/mocks/favourite-router.ts",
       "^@/(.*)$": "<rootDir>/src/$1"
     }
   },
@@ -53,6 +63,6 @@
     "nodemon": "^3.1.0",
     "supertest": "^7.2.2",
     "tsx": "^4.23.0",
-    "typescript": "6.0.3"
+    "typescript": "5.5.4"
   }
 }

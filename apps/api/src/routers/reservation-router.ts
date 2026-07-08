@@ -46,6 +46,7 @@ reservationRouter.use(requireAuth);
  *           type: integer
  *         status:
  *           type: string
+ *           enum: [CONFIRMED, CANCELLED]
  *         createdAt:
  *           type: string
  *           format: date-time
@@ -61,9 +62,10 @@ reservationRouter.use(requireAuth);
  *           format: date
  *         reservationTime:
  *           type: string
- *           format: time
+ *           example: "19:30"
  *         partySize:
  *           type: integer
+ *           minimum: 1
  *       required:
  *         - restaurantId
  *         - reservationDate
@@ -82,7 +84,7 @@ reservationRouter.use(requireAuth);
  *     summary: Create a reservation
  *     tags: [Reservations]
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -96,13 +98,39 @@ reservationRouter.use(requireAuth);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Reservation'
+ *       400:
+ *         description: Invalid request payload or reservation is in the past.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               oneOf:
+ *                 - $ref: '#/components/schemas/ErrorResponse'
+ *                 - $ref: '#/components/schemas/ValidationErrorResponse'
+ *       401:
+ *         description: Unauthorized.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       404:
+ *         description: Restaurant or reservation settings not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       409:
+ *         description: Slot capacity exceeded.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *
- * /api/me/reservations:
+ * /api/reservations/me:
  *   get:
  *     summary: Get my reservations
  *     tags: [Reservations]
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     responses:
  *       200:
  *         description: List of reservations.
@@ -112,13 +140,19 @@ reservationRouter.use(requireAuth);
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Reservation'
+ *       401:
+ *         description: Unauthorized.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *
  * /api/reservations/{reservationId}:
  *   get:
  *     summary: Get a reservation by ID
  *     tags: [Reservations]
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: reservationId
@@ -132,13 +166,31 @@ reservationRouter.use(requireAuth);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Reservation'
+ *       400:
+ *         description: Invalid reservation id.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ValidationErrorResponse'
+ *       401:
+ *         description: Unauthorized.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       404:
+ *         description: Reservation not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *
  * /api/reservations/{reservationId}/cancel:
  *   patch:
  *     summary: Cancel a reservation
  *     tags: [Reservations]
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: reservationId
@@ -152,6 +204,36 @@ reservationRouter.use(requireAuth);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Reservation'
+ *       400:
+ *         description: Invalid reservation id.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ValidationErrorResponse'
+ *       401:
+ *         description: Unauthorized.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       403:
+ *         description: Reservation does not belong to the authenticated user.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       404:
+ *         description: Reservation not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       409:
+ *         description: Reservation already cancelled.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 
 reservationRouter

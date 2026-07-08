@@ -62,6 +62,16 @@ commentRouter.use(requireAuth);
  *         - rating
  *         - body
  *
+ *     UpdateComment:
+ *       type: object
+ *       properties:
+ *         rating:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 5
+ *         body:
+ *           type: string
+ *
  * tags:
  *   name: Comments
  *   description: Comment management endpoints
@@ -74,13 +84,14 @@ commentRouter.use(requireAuth);
  *     summary: Get comments for a restaurant
  *     tags: [Comments]
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: restaurantId
  *         required: true
  *         schema:
  *           type: string
+ *           format: uuid
  *     responses:
  *       200:
  *         description: List of comments.
@@ -90,18 +101,37 @@ commentRouter.use(requireAuth);
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Comment'
+ *       400:
+ *         description: Invalid restaurant id.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ValidationErrorResponse'
+ *       401:
+ *         description: Unauthorized.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       404:
+ *         description: Restaurant not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *
  *   post:
  *     summary: Create a comment for a restaurant
  *     tags: [Comments]
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: restaurantId
  *         required: true
  *         schema:
  *           type: string
+ *           format: uuid
  *     requestBody:
  *       required: true
  *       content:
@@ -115,43 +145,115 @@ commentRouter.use(requireAuth);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Comment'
+ *       400:
+ *         description: Invalid restaurant id or request body.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               oneOf:
+ *                 - $ref: '#/components/schemas/ErrorResponse'
+ *                 - $ref: '#/components/schemas/ValidationErrorResponse'
+ *       401:
+ *         description: Unauthorized.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       404:
+ *         description: Restaurant not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *
  * /api/comments/{commentId}:
  *   patch:
  *     summary: Update a comment
  *     tags: [Comments]
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: commentId
  *         required: true
  *         schema:
  *           type: string
+ *           format: uuid
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/CreateComment'
+ *               $ref: '#/components/schemas/UpdateComment'
  *     responses:
  *       200:
  *         description: Comment updated.
+ *       400:
+ *         description: Invalid comment id or request body.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               oneOf:
+ *                 - $ref: '#/components/schemas/ErrorResponse'
+ *                 - $ref: '#/components/schemas/ValidationErrorResponse'
+ *       401:
+ *         description: Unauthorized.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       403:
+ *         description: Forbidden.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       404:
+ *         description: Comment not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *
  *   delete:
  *     summary: Delete a comment
  *     tags: [Comments]
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
  *         name: commentId
  *         required: true
  *         schema:
  *           type: string
+ *           format: uuid
  *     responses:
  *       204:
  *         description: Comment deleted.
+ *       400:
+ *         description: Invalid comment id.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ValidationErrorResponse'
+ *       401:
+ *         description: Unauthorized.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       403:
+ *         description: Forbidden.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       404:
+ *         description: Comment not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 
 commentRouter

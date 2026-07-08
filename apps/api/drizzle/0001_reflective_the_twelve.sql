@@ -1,0 +1,2 @@
+CREATE INDEX "reservations_slot_status_idx" ON "reservations" USING btree ("restaurant_id","reservation_date","reservation_time","status");--> statement-breakpoint
+CREATE INDEX "reservations_slot_idx" ON "reservations" USING btree ("restaurant_id","reservation_date","reservation_time");

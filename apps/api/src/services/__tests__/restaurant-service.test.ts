@@ -6,69 +6,48 @@ jest.mock("@/db/repositories/restaurant-repository", () => ({
 
 import { RestaurantService } from "../restaurant-service";
 
-describe("RestaurantService comments", () => {
-	it("creates a comment for an existing restaurant", async () => {
+describe("RestaurantService", () => {
+	it("returns all restaurants", async () => {
 		const mockRepository = {
-			getById: jest.fn().mockResolvedValue({ id: "restaurant-1" }),
-			createComment: jest.fn().mockResolvedValue({
-				id: "comment-1",
-				restaurantId: "restaurant-1",
-				userId: "user-1",
-				rating: 5,
-				body: "Excellent",
-			}),
+			getAll: jest.fn().mockResolvedValue([{ id: "restaurant-1", name: "R1" }]),
 		};
 
-		const service = new RestaurantService(mockRepository);
+		const service = new RestaurantService(mockRepository as any);
+		const restaurants = await service.getAllRestaurants();
 
-		const comment = await service.createComment("restaurant-1", "user-1", {
-			rating: 5,
-			body: "Excellent",
-		});
-
-		expect(mockRepository.getById).toHaveBeenCalledWith("restaurant-1");
-		expect(mockRepository.createComment).toHaveBeenCalledWith("restaurant-1", "user-1", {
-			rating: 5,
-			body: "Excellent",
-		});
-		expect(comment).toMatchObject({
-			id: "comment-1",
-			restaurantId: "restaurant-1",
-			userId: "user-1",
-		});
+		expect(mockRepository.getAll).toHaveBeenCalled();
+		expect(restaurants).toEqual([{ id: "restaurant-1", name: "R1" }]);
 	});
 
-	it("creates a reservation for an existing restaurant", async () => {
+	it("updates a restaurant when it exists", async () => {
 		const mockRepository = {
 			getById: jest.fn().mockResolvedValue({ id: "restaurant-1" }),
-			createReservation: jest.fn().mockResolvedValue({
-				id: "reservation-1",
-				restaurantId: "restaurant-1",
-				userId: "user-1",
-				status: "CONFIRMED",
-			}),
+			update: jest.fn().mockResolvedValue({ id: "restaurant-1", name: "Updated" }),
 		};
 
-		const service = new RestaurantService(mockRepository);
-
-		const reservation = await service.createReservation("user-1", {
-			restaurantId: "restaurant-1",
-			reservationDate: "2026-07-10",
-			reservationTime: "19:00",
-			partySize: 4,
-		});
+		const service = new RestaurantService(mockRepository as any);
+		const updated = await service.updateRestaurant("restaurant-1", {
+			name: "Updated",
+		} as any);
 
 		expect(mockRepository.getById).toHaveBeenCalledWith("restaurant-1");
-		expect(mockRepository.createReservation).toHaveBeenCalledWith("user-1", {
-			restaurantId: "restaurant-1",
-			reservationDate: "2026-07-10",
-			reservationTime: "19:00",
-			partySize: 4,
+		expect(mockRepository.update).toHaveBeenCalledWith("restaurant-1", {
+			name: "Updated",
 		});
-		expect(reservation).toMatchObject({
-			id: "reservation-1",
-			restaurantId: "restaurant-1",
-			userId: "user-1",
-		});
+		expect(updated).toEqual({ id: "restaurant-1", name: "Updated" });
+	});
+
+	it("throws when deleting a restaurant that does not exist", async () => {
+		const mockRepository = {
+			getById: jest.fn().mockResolvedValue(null),
+			delete: jest.fn(),
+		};
+
+		const service = new RestaurantService(mockRepository as any);
+
+		await expect(service.deleteRestaurant("restaurant-1")).rejects.toThrow(
+			"Restaurant not found",
+		);
+		expect(mockRepository.delete).not.toHaveBeenCalled();
 	});
 });
