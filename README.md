@@ -10,6 +10,8 @@ This monorepo uses Turborepo and contains:
 - `apps/api`: Express + TypeScript backend
 - `packages/*`: shared config/packages
 
+Project management is handled with GitHub Projects and issues. The project board is at [GitHub Project - Restaurant Booker](https://github.com/users/Davidrodrguez98/projects/2)
+
 ## Tech Stack and Architecture
 
 - Frontend: Next.js (App Router), React, Tailwind CSS
