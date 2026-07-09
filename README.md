@@ -105,6 +105,8 @@ cd apps/api && pnpm drizzle-kit migrate && bun run ./src/db/seed.ts
 
 ### 4) Start development
 
+Desde la raíz del repositorio:
+
 ```sh
 pnpm run dev
 ```
@@ -136,7 +138,7 @@ pnpm --filter api test
 
 ## Docker Run
 
-If `docker-compose.yml` uses external network `app_network`, create it first:
+`docker-compose.yml` uses external network `app_network`, create it first:
 
 ```sh
 docker network create app_network
