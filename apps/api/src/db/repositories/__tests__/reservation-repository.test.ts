@@ -1,5 +1,6 @@
 import { describe, expect, it, jest } from "@jest/globals";
 
+import { transactionDb } from "@/db/transaction-db";
 import { ReservationRepository } from "../reservation-repository";
 
 type MockTxConfig = {
@@ -17,6 +18,7 @@ function createMockTx(config: MockTxConfig = {}) {
   const insertValues = jest.fn();
   const updateSet = jest.fn();
 
+  // Mock transaction object with methods for select, insert, and update
   const tx = {
     execute,
     select: jest.fn(() => {
@@ -61,17 +63,14 @@ function createMockTx(config: MockTxConfig = {}) {
 function createRepositoryWithTx(config: MockTxConfig = {}) {
   const { tx, execute, insertValues } = createMockTx(config);
 
-  const writeDb = {
-    transaction: jest.fn(async (callback: (innerTx: unknown) => unknown) =>
+  const writeDb = transactionDb as any;
+
+  writeDb.transaction = jest.fn(
+    async (callback: (innerTx: unknown) => unknown) =>
       callback(tx),
-    ),
-  };
+  );
 
-  const readDb = {
-    select: jest.fn(),
-  };
-
-  const repository = new ReservationRepository(readDb as any, writeDb as any);
+  const repository = new ReservationRepository();
 
   return {
     repository,

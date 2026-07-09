@@ -1,122 +1,236 @@
-# Restaurant Booker App
+# Restaurant Booker Documentation
 
-## Description
+## Overview
 
-This is a Restaurant Booker App design to allow people to book a table at their favorite restaurant. The app frontend is built using Next.js, and the backend is built using Node.js and Express.js. The app allows users to view available restaurants, select a restaurant, choose a date and time, and book a table. Users can also view their booking history and cancel bookings if needed. Users can also leave reviews for restaurants they have visited and manage favourites restaurants. The app is designed to be user-friendly and responsive, making it easy for users to book a table from their desktop or mobile device.
+Restaurant Booker is a full-stack app to browse restaurants, check availability, create/cancel reservations, manage favourites, and post comments.
 
-## Deploy on Vercel
+This monorepo uses Turborepo and contains:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `apps/web`: Next.js frontend
+- `apps/api`: Express + TypeScript backend
+- `packages/*`: shared config/packages
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Tech Stack and Architecture
 
-## AI usage
+- Frontend: Next.js (App Router), React, Tailwind CSS
+- Backend: Express, Drizzle ORM, Better Auth, Zod, Swagger
+- Database: Neon + PostgreSQL
+- Monorepo tooling: pnpm + Turborepo
+- Deployment/runtime: Docker + Docker Compose
 
-- Ayudar a elegir las tecnologías adeacuadas para el proyecto.
-- Ayudar a cambiar yarn por pnpm en boilerplate de turborepo con docker y resolver errores de este cambio.
-- boilerplate express y next turborepo con docker, better auth, drizzle, supabase y tailwindcss.
-- Arreglar pequeños bugs al generar migraciones de better-auth con drizzle, como la definición de relaciones de la forma v2 de drizzle.
-- Arreglar bug de dependencias circulares con relaciones de drizzle al estar en distintos archivos.
-- Construir repositorios y servicios base para las entidades de la app, como restaurant, reservation, comment, etc.
-- Output rechazado de la IA: Código repetitivo que le dije que lo extraiga a una función aparte.
-- mejorar organizacion de archivos y carpetas, como separar lógica de comentarios y de restaurantes.
+## Core Functional Scope
 
-## Cosas útiles
+- Authentication: sign-up, sign-in, sign-out
+- Restaurants: list, detail, availability, create, update, delete
+- Reservations: list mine, detail, create, cancel
+- Comments: list/create by restaurant, update/delete by comment
+- Favourites: list mine, add/remove restaurant
 
-- boilerplate express y next turborepo con docker https://github.com/vercel/turborepo/tree/main/examples/with-docker
-- Flujo de autenticación con better-auth y drizzle:
-  - Front llama a api POST /api/auth/sign-in/email con email y password.
-  - Backend llama a better-auth para validar credenciales y generar un token JWT que devuelve al frontend.
-  - Frontend guarda el token JWT en localStorage y lo envía en la cabecera Authorization de las siguientes peticiones a la API.
-  - Backend valida el token JWT en cada petición y obtiene el usuario autenticado.
-- Se devuelve el objeto restaurant en el endpoint de GET favourites, para no tener que hacer otra llamada a la API para obtener los datos del restaurant ni hacer el filtrado en frontal, ya que había pensado que justo al iniciar sesión se haría un get de todos los restaurantes y guardarlos en un store, pero puede ser que el usuario acceda directamente a otra vista que no sea en la que se hace este GET o que en un futuro se paginen los restaurantes y no se tengan todos en el store, por lo que es mejor devolver el restaurant en el endpoint de favourites.
-- en el formulario de creacion de restaurantes se ha dejado el campo image sin validación en frontal para demostrar que se manejan correctamente los errores que provienen del backend.
+## Database Schema
 
-## Pasos para correr la app en local
+![Database Schema](database-schema.jpg "Database Schema")
 
-- Instalar dependencias: `pnpm install`
-- Crear un archivo `.env` en
-  - `apps/api` con las variables de entorno:
-    - `DATABASE_URL`
-    - `DATABASE_URL_UNPOOLED`
-    - `BETTER_AUTH_SECRET`
-    - `BETTER_AUTH_URL`
-  - `apps/web` con las variables de entorno:
-    - `NEXT_PUBLIC_API_URL`
-- Se pueden ejecutar las migraciones de la base de datos y los seeders con: `cd apps/api && bun run ./src/db/seed.ts` (instalar `bun` si no está instalado desde https://bun.sh/), pero como es una base de datos persistente, no es necesario ejecutarlo porque ya están ejecutadas.
-- Correr la app en modo desarrollo desde la raíz del monorepo: `pnpm run dev`
-- Abrir http://localhost:3000 en el navegador. Utilizar las credenciales de prueba para iniciar sesión: `email: test@test.com`, `password: 12345678`.
+## API Endpoint Summary
 
-# Turborepo Docker starter
+```txt
+POST   /api/auth/sign-up/email
+POST   /api/auth/sign-in/email
+POST   /api/auth/sign-out
 
-This is a community-maintained example. If you experience a problem, please submit a pull request with a fix. GitHub Issues will be closed.
+GET    /api/restaurants
+GET    /api/restaurants/:id
+GET    /api/restaurants/:id/availability?date=YYYY-MM-DD&partySize=N
+POST   /api/restaurants
+PATCH  /api/restaurants/:id
+DELETE /api/restaurants/:id
 
-## Using this example
+GET    /api/me/favourites
+POST   /api/me/favourites/:restaurantId
+DELETE /api/me/favourites/:restaurantId
 
-Run the following command:
+GET    /api/restaurants/:id/comments
+POST   /api/restaurants/:id/comments
+PATCH  /api/comments/:id
+DELETE /api/comments/:id
+
+GET    /api/reservations/me
+GET    /api/reservations/:id
+POST   /api/reservations
+PATCH  /api/reservations/:id/cancel
+```
+
+## Important Implementation Notes
+
+- Auth flow in this project:
+  1. Frontend calls `POST /api/auth/sign-in/email` with email and password.
+  2. Backend validates with Better Auth.
+  3. Frontend sends authenticated requests to API.
+- `GET /api/me/favourites` returns full restaurant objects to avoid extra frontend fetches and reduce client-side filtering complexity.
+- Restaurant create form intentionally leaves `image` less strictly validated on frontend to demonstrate backend validation/error handling.
+
+## Local Development
+
+### Requirements
+
+- Node.js >= 20
+- pnpm >= 11.9.0
+- Docker + Docker Compose (optional, for containerized run)
+
+### 1) Install dependencies
 
 ```sh
-npx create-turbo@latest -e with-docker
-```
-
-## What's inside?
-
-This Turborepo includes the following:
-
-### Apps and Packages
-
-- `web`: a [Next.js](https://nextjs.org/) app
-- `api`: an [Express](https://expressjs.com/) server
-- `@repo/eslint-config`: ESLint presets
-- `@repo/typescript-config`: tsconfig.json's used throughout the monorepo
-- `@repo/jest-presets`: Jest configurations
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Docker
-
-This repo is configured to be built with Docker, and Docker compose. To build all apps in this repo:
-
-```
-# Install dependencies
 pnpm install
+```
 
-# Create a network, which allows containers to communicate
-# with each other, by using their container name as a hostname
+### 2) Create env files
+
+Create `apps/api/.env` with:
+
+- `DATABASE_URL`
+- `DATABASE_URL_UNPOOLED`
+- `BETTER_AUTH_SECRET`
+- `BETTER_AUTH_URL`
+
+Create `apps/web/.env` with:
+
+- `NEXT_PUBLIC_API_URL`
+
+### 3) (Optional) Run migrations and seed database
+
+```sh
+cd apps/api && pnpm drizzle-kit migrate && bun run ./src/db/seed.ts
+```
+
+### 4) Start development
+
+```sh
+pnpm run dev
+```
+
+Local URLs:
+
+- Frontend: http://localhost:3000
+- API: http://localhost:3001
+
+Test user:
+
+- email: `test@test.com`
+- password: `12345678`
+
+## Build and Test
+
+From repository root:
+
+```sh
+pnpm build
+pnpm test
+```
+
+API only:
+
+```sh
+pnpm --filter api test
+```
+
+## Docker Run
+
+If `docker-compose.yml` uses external network `app_network`, create it first:
+
+```sh
 docker network create app_network
+```
 
-# Build prod using new BuildKit engine
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f docker-compose.yml build
+Build and start:
 
-# Start prod in detached mode
+```sh
+docker-compose -f docker-compose.yml build
 docker-compose -f docker-compose.yml up -d
 ```
 
-Open http://localhost:3000.
+Stop:
 
-To shutdown all running containers:
-
-```
-# Stop running containers started by docker-compse
- docker-compose -f docker-compose.yml down
+```sh
+docker-compose -f docker-compose.yml down
 ```
 
-### Remote Caching
+## Validation and Error Handling Contract
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+- Validate all `body`, `query`, and `params` inputs with Zod before service logic.
+- Validation failures are normalized into a client-friendly response with:
+  - `error`: a generic summary (`"Invalid request data"`)
+  - `details`: field-level validation errors derived from Zod issues
+- Field paths are returned in dot notation (for example `body.image`) so frontend forms can map errors directly to inputs.
+- Return `400` for invalid input.
+- Return `404` for missing resources.
+- Return `409` for booking conflicts.
+- Return `500` only for unexpected errors.
 
-This example includes optional remote caching. In the Dockerfiles of the apps, uncomment the build arguments for `TURBO_TEAM` and `TURBO_TOKEN`. Then, pass these build arguments to your Docker build.
+Example error format:
 
-You can test this behavior using a command like:
+```json
+{
+	"error": "Invalid request data",
+	"details": [
+		{
+			"field": "body.image",
+			"message": "Invalid input: expected string, received undefined"
+		}
+	]
+}
+```
 
-`docker build -f apps/web/Dockerfile . --build-arg TURBO_TEAM=“your-team-name” --build-arg TURBO_TOKEN=“your-token“ --no-cache`
+## Booking Rules to Keep in Mind
 
-### Utilities
+- No bookings in the past.
+- Party size must be valid and positive.
+- Time slot capacity must fit party size.
+- No overlapping reservations on the same time slot.
+- Cancelled reservations must not block future availability.
+- Availability should be computed from schedule, capacity, and existing reservations.
+- Reservation creation should be transaction-safe to avoid race conditions.
 
-This Turborepo has some additional tools already setup for you:
+## AI Usage Disclosure
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Jest](https://jestjs.io) test runner for all things JavaScript
-- [Prettier](https://prettier.io) for code formatting
+AI tools used during development:
+
+- GitHub Copilot
+- v0
+
+Used for:
+
+- technology selection and boilerplate acceleration
+- migration from yarn to pnpm in turborepo/docker setup
+- debugging setup issues and small refactors
+- initial frontend scaffolding and iterative code improvements
+- documentation and README generation
+- code refactoring
+- Replace yarn with pnpm in turborepo/docker setup and fix related issues
+- Circular dependency issues in database schemas.
+
+Rejected AI output:
+
+- repetitive code that was replaced by extracted/shared functions
+
+Important reviewed AI output:
+
+- concurrency-safe reservation creation logic
+- database seeding scripts
+- API error handling and validation patterns
+- unit tests
+- Zod validations
+- file/folder organization and separation of concerns
+- frontend template from v0 for Next.js app
+
+The `AGENTS.md` file is included at the root of the repository.
+
+## Future Improvements
+
+- Email notifications for booking confirmations and cancellations.
+- Online payment integration for booking deposits with Stripe.
+- Role-based access control and admin panel for restaurant owners to manage availability and view bookings.
+- Pagination for restaurant list, comments and booking history.
+- Server-side filtering and sorting options for restaurants.
+- When app is deployed, a static IP must be configured and included in a white list in the database configuration in order to allow access only from that IP.
+- Create/edit reservation settings and service windows for restaurants.
+- Add i18n support for multiple languages and locales.
+- Restaurant map integration with Google Maps for location display and directions using latitude and longitude fields.

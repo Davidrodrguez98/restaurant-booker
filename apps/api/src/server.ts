@@ -9,24 +9,6 @@ import swaggerUi from "swagger-ui-express";
 import { favouriteRouter } from "./routers/favourite-router";
 import { swaggerDocs } from "@/openapi";
 
-/**
- * @swagger
- * /api/health:
- *   get:
- *     summary: Health check
- *     tags: [System]
- *     responses:
- *       200:
- *         description: Service is healthy.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: ok
- */
 
 export const createServer = (): Express => {
 	const app = express();
@@ -42,9 +24,6 @@ export const createServer = (): Express => {
 	app.all("/api/auth/*", toNodeHandler(auth));
 	app.use(express.json());
 	app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-	app.get("/api/health", (req, res) => {
-		res.status(200).json({ status: "ok" });
-	});
 	app.use("/api/restaurants", restaurantRouter);
 	app.use("/api", commentRouter);
 	app.use("/api/reservations", reservationRouter);

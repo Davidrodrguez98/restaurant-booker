@@ -41,6 +41,7 @@ export class RestaurantRepository {
   }
 
   async create(data: RestaurantInsert) {
+	// Create a new restaurant and its associated reservation settings and service windows in a single transaction
     const created = await transactionDb.transaction(async (tx) => {
       const [newRestaurant] = await tx.insert(restaurant).values(data).returning();
 

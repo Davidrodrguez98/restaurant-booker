@@ -32,7 +32,7 @@ describe("ReservationService", () => {
 
 		const reservation = await service.createReservation("user-1", {
 			restaurantId: "restaurant-1",
-			reservationDate: "2026-07-10",
+			reservationDate: "2027-07-10",
 			reservationTime: "19:00:00",
 			partySize: 4,
 		} as any);
@@ -70,12 +70,12 @@ describe("ReservationService", () => {
 			mockRestaurantRepository as any,
 		);
 
-		const availability = await service.getAvailability("restaurant-1", "2026-07-10", 4);
+		const availability = await service.getAvailability("restaurant-1", "2027-07-10", 4);
 
 		expect(mockRestaurantRepository.getById).toHaveBeenCalledWith("restaurant-1");
 		expect(mockReservationRepository.getAvailability).toHaveBeenCalledWith(
 			"restaurant-1",
-			"2026-07-10",
+			"2027-07-10",
 			4,
 		);
 		expect(availability).toEqual([
@@ -114,7 +114,7 @@ describe("ReservationService", () => {
 		await expect(
 			service.createReservation("user-1", {
 				restaurantId: "restaurant-1",
-				reservationDate: "2026-07-10",
+				reservationDate: "2027-07-10",
 				reservationTime: "19:00:00",
 				partySize: 6,
 			} as any),
@@ -184,7 +184,7 @@ describe("ReservationService", () => {
 
 		const requestData = {
 			restaurantId: "restaurant-1",
-			reservationDate: "2026-07-10",
+			reservationDate: "2027-07-10",
 			reservationTime: "19:00:00",
 			partySize: 4,
 		} as any;

@@ -16,7 +16,6 @@ import {
 	Heart,
 	Pencil,
 	Trash2,
-	Plus,
 	X,
 	Check,
 } from "lucide-react";

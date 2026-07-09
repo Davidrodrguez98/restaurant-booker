@@ -2,6 +2,8 @@
 	"extends": "@repo/typescript-config/base.json",
 	"compilerOptions": {
 		"target": "es2022",
+		"esModuleInterop": true,
+		"skipLibCheck": true,
 		"lib": ["ES2022"],
 		"declaration": false,
 		"declarationMap": false,
@@ -10,7 +12,6 @@
 		"strictNullChecks": true,
 		"ignoreDeprecations": "6.0",
 		"types": ["node"],
-		"baseUrl": ".",
 		"paths": {
 			"@/*": ["./src/*"]
 		}

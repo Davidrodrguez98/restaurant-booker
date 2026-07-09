@@ -131,7 +131,7 @@ export default function HomePage() {
 			)}
 
 			<main className="pt-20">
-				{/* Hero Section */}
+				{/* Title Section */}
 				<section className="bg-linear-to-r from-primary/10 via-transparent to-primary/5 border-b border-border">
 					<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
 						<h1 className="text-5xl md:text-6xl font-bold text-foreground mb-4 leading-tight text-balance">

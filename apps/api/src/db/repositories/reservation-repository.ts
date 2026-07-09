@@ -16,13 +16,8 @@ type CreateReservationInput = Omit<
 >;
 
 export class ReservationRepository {
-	constructor(
-		private readonly readDb: typeof db = db,
-		private readonly writeDb: typeof transactionDb = transactionDb,
-	) {}
-
 	async getReservationsByUserId(userId: string) {
-		return this.readDb
+		return db
 			.select()
 			.from(reservation)
 			.where(eq(reservation.userId, userId))
@@ -30,7 +25,7 @@ export class ReservationRepository {
 	}
 
 	async getReservationById(reservationId: string) {
-		const [result] = await this.readDb
+		const [result] = await db
 			.select()
 			.from(reservation)
 			.where(eq(reservation.id, reservationId))
@@ -49,7 +44,7 @@ export class ReservationRepository {
 
 		this.assertReservationInFuture(data.reservationDate, normalizedTime);
 
-		return this.writeDb.transaction(async (tx) => {
+		return transactionDb.transaction(async (tx) => {
 			const setting = await this.getReservationSetting(tx, data.restaurantId);
 
 			if (!setting) {
@@ -77,7 +72,6 @@ export class ReservationRepository {
 			);
 
 			const occupiedSeats = calculateOccupiedSeats({
-				bookedSlots: 0,
 				confirmedReservations: occupancy.createdReservations,
 				cancelledReservations: occupancy.cancelledReservations,
 			});
@@ -109,7 +103,7 @@ export class ReservationRepository {
 	}
 
 	async cancelReservation(reservationId: string, userId: string) {
-		return this.writeDb.transaction(async (tx) => {
+		return transactionDb.transaction(async (tx) => {
 			const [existingReservation] = await tx
 				.select()
 				.from(reservation)
@@ -155,56 +149,21 @@ export class ReservationRepository {
 	}
 
 	async getAvailability(restaurantId: string, date: string, partySize: number) {
-		const settings = await this.readDb
-			.select({
-				id: reservationSetting.id,
-				slotIntervalMinutes: reservationSetting.slotIntervalMinutes,
-				defaultSlotCapacity: reservationSetting.defaultSlotCapacity,
-			})
-			.from(reservationSetting)
-			.where(eq(reservationSetting.restaurantId, restaurantId))
-			.limit(1);
-
-		const setting = settings[0];
+		const setting = await this.getReservationSetting(db, restaurantId);
 
 		if (!setting) {
 			return [];
 		}
 
-		const windows = await this.readDb
-			.select({
-				start: serviceWindow.start,
-				end: serviceWindow.end,
-			})
-			.from(serviceWindow)
-			.where(eq(serviceWindow.reservationSettingId, setting.id));
-
-		const occupancyForDay = await this.readDb
-			.select({
-				reservationTime: reservation.reservationTime,
-				createdReservations:
-					sql<number>`coalesce(sum(${reservation.partySize}), 0)`.as(
-						"createdReservations",
-					),
-				cancelledReservations:
-					sql<number>`coalesce(sum(case when ${reservation.status} = 'CANCELLED' then ${reservation.partySize} else 0 end), 0)`.as(
-						"cancelledReservations",
-					),
-			})
-			.from(reservation)
-			.where(
-				and(
-					eq(reservation.restaurantId, restaurantId),
-					eq(reservation.reservationDate, date),
-				),
-			)
-			.groupBy(reservation.reservationTime);
+		const windows = await this.getServiceWindows(db, setting.id);
+		const occupancyForDay = await this.getDayOccupancy(db, restaurantId, date);
 
 		const occupancyByTime = new Map<
 			string,
 			{ created: number; cancelled: number }
 		>();
 
+		// Populate the occupancyByTime map with the occupancy data for each time slot
 		for (const occupancyEntry of occupancyForDay) {
 			occupancyByTime.set(this.normalizeTime(occupancyEntry.reservationTime), {
 				created: Number(occupancyEntry.createdReservations ?? 0),
@@ -231,7 +190,6 @@ export class ReservationRepository {
 					cancelled: 0,
 				};
 				const occupiedSeats = calculateOccupiedSeats({
-					bookedSlots: 0,
 					confirmedReservations: occupancy.created,
 					cancelledReservations: occupancy.cancelled,
 				});
@@ -251,6 +209,29 @@ export class ReservationRepository {
 		}
 
 		return slots;
+	}
+
+	private async getDayOccupancy(tx: any, restaurantId: string, reservationDate: string) {
+		return tx
+			.select({
+				reservationTime: reservation.reservationTime,
+				createdReservations:
+					sql<number>`coalesce(sum(${reservation.partySize}), 0)`.as(
+						"createdReservations",
+					),
+				cancelledReservations:
+					sql<number>`coalesce(sum(case when ${reservation.status} = 'CANCELLED' then ${reservation.partySize} else 0 end), 0)`.as(
+						"cancelledReservations",
+					),
+			})
+			.from(reservation)
+			.where(
+				and(
+					eq(reservation.restaurantId, restaurantId),
+					eq(reservation.reservationDate, reservationDate),
+				),
+			)
+			.groupBy(reservation.reservationTime);
 	}
 
 	private async getReservationSetting(tx: any, restaurantId: string) {

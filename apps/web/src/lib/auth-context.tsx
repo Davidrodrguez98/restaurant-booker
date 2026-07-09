@@ -86,8 +86,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 	}, []);
 
 	const persistSession = (sessionUser: User | null) => {
-		// The Better Auth client stores the bearer token from the
-		// `set-auth-token` response header in its onSuccess handler.
 		const sessionToken = localStorage.getItem(TOKEN_KEY);
 		if (sessionToken) {
 			setToken(sessionToken);
