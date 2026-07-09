@@ -236,3 +236,16 @@ The `AGENTS.md` file is included at the root of the repository.
 - Create/edit reservation settings and service windows for restaurants.
 - Add i18n support for multiple languages and locales.
 - Restaurant map integration with Google Maps for location display and directions using latitude and longitude fields.
+
+## Bonus Points
+
+- [ ] Deploy the app.
+- [x] Use JWT authentication.
+- [x] Use Tailwind CSS.
+- [x] Add a persistence layer.
+- [x] Add OpenAPI/Swagger documentation.
+- [x] Add Docker or Docker Compose.
+- [x] Write realistic unit tests for backend business rules.
+- [ ] Write integration tests for API endpoints.
+- [ ] Write end-to-end tests for the main frontend flow.
+- [x] Add basic accessibility improvements.
