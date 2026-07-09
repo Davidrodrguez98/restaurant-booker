@@ -105,7 +105,7 @@ cd apps/api && pnpm drizzle-kit migrate && bun run ./src/db/seed.ts
 
 ### 4) Start development
 
-Desde la raíz del repositorio:
+From repository root:
 
 ```sh
 pnpm run dev
